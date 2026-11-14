@@ -136,7 +136,7 @@
       dispatchEvent(new CustomEvent("pr-me", { detail: me }));
       closePop(); paintAva(); meEl.classList.remove("saved"); void meEl.offsetWidth; meEl.classList.add("saved");
       try { localStorage.setItem("pr-wk-diy", "1"); } catch {}
-      hold("짠! 어때요? ✨", 2600);
+      if (isM() && mSay) { mSay("짠! 어때요? ✨", 3000); const mwEl = document.querySelector(".mw"); if (mwEl) { mwEl.classList.remove("tickle"); void mwEl.offsetWidth; mwEl.classList.add("tickle"); } } else hold("짠! 어때요? ✨", 2600);
     });
     pop.addEventListener("click", ev => { if (ev.target === pop || ev.target.closest(".wkp-x") || ev.target.closest("[data-x]")) closePop(); });
     setTimeout(() => pop && pop.querySelector(".wkp-save").focus({ preventScroll: true }), 50);
@@ -214,8 +214,8 @@
     let greeted = false, again = false, mStill = 0;
     const diyMsg = () => mSay("DIY ME! ✂️", 4500);
     new MutationObserver(() => { if (!isM() || !dock.classList.contains("show") || greeted) return; greeted = true;
-      setTimeout(() => { mSay(greet(), 2800); setTimeout(() => { if (mBub.hidden) diyMsg(); }, 3100); }, 500); }).observe(dock, { attributes: true, attributeFilter: ["class"] });
-    addEventListener("scroll", () => { if (!isM() || again || !greeted) return; clearTimeout(mStill); mStill = setTimeout(() => { if (mBub.hidden && dock.classList.contains("show")) { again = true; diyMsg(); } }, 12000); }, { passive: true });
+      setTimeout(() => { mSay(greet(), 2800); setTimeout(() => { if (mBub.hidden && !diy()) diyMsg(); }, 3100); }, 500); }).observe(dock, { attributes: true, attributeFilter: ["class"] });
+    addEventListener("scroll", () => { if (!isM() || again || !greeted || diy()) return; clearTimeout(mStill); mStill = setTimeout(() => { if (mBub.hidden && dock.classList.contains("show")) { again = true; diyMsg(); } }, 12000); }, { passive: true });
     paintAva(); mPlace();
   }
   /* 방명록에서 캐릭터를 바꾸면 걷는 관람객도 같이 바뀐다 */
