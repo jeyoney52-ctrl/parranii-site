@@ -41,16 +41,23 @@
   const diy = () => !!LS("pr-wk-diy");               // ‘DIY ME’에서 저장을 한 번이라도 했는지
   let visits = 1; try { visits = (+localStorage.getItem("pr-wk-visits") || 0) + 1; localStorage.setItem("pr-wk-visits", String(visits)); } catch {}
   /* 상황별 말풍선 */
+  const greet = () => { const h = new Date().getHours();
+    if (h >= 22 || h < 5) return "늦은 밤에도 와 주셨네요 🌙";
+    if (h < 11) return "좋은 아침이에요 ☀️";
+    if (h < 14) return "점심은 맛있게 드셨어요? 🍚";
+    if (h >= 18) return "좋은 저녁이에요 🌆";
+    return visits > 1 ? "또 오셨네요! 반가워요 🙌" : "안녕하세요! 👋"; };
   function say(p) {
     if (bub.dataset.hold) return;
     let t, a = false;
-    if (p > .8 && !wrote()) { t = "방명록도 남겨주실거죠? 💌"; a = true; }
+    const end = p > .9 && scrollY >= maxY() - 120;
+    if (end) { t = wrote() ? "끝까지 봐 주셨네요! 👏" : "끝까지 봐 주셨네요! 👏 방명록도 남겨주실래요? 💌"; a = !wrote(); }
+    else if (p > .8 && !wrote()) { t = "방명록도 남겨주실거죠? 💌"; a = true; }
     else if (!diy()) t = "DIY ME!";
     else if (sleepy) t = "쉬었다 가요 💤";
-    else if (scrollY >= maxY() - 40 && p > .9) t = "끝까지 봐 주셨네요! 👏";
     else if (p >= .64) t = wrote() ? "다녀가 줘서 고마워요 💕" : "천천히 보고 가요 ☕";
     else if (p >= .3) t = "포스터를 눌러 보세요 👆";
-    else t = visits > 1 ? "또 오셨네요! 반가워요 🙌" : "안녕하세요! 👋";
+    else t = greet();
     ask = a;
     if (bub.textContent !== t) { bub.textContent = t; bub.classList.toggle("talk", t !== "DIY ME!"); }
     bub.setAttribute("aria-label", a ? "방명록 남기러 가기" : "내 관람객 꾸미기");
@@ -117,14 +124,42 @@
       dispatchEvent(new CustomEvent("pr-me", { detail: me }));
       closePop(); paintAva(); meEl.classList.remove("saved"); void meEl.offsetWidth; meEl.classList.add("saved");
       try { localStorage.setItem("pr-wk-diy", "1"); } catch {}
-      bub.dataset.hold = "1"; bub.textContent = "짠! 어때요? ✨"; bub.classList.add("talk"); setTimeout(() => { delete bub.dataset.hold; say(prog()); }, 2600);
+      hold("짠! 어때요? ✨", 2600);
     });
     pop.addEventListener("click", ev => { if (ev.target === pop || ev.target.closest(".wkp-x") || ev.target.closest("[data-x]")) closePop(); });
     setTimeout(() => pop && pop.querySelector(".wkp-save").focus({ preventScroll: true }), 50);
   }
   function closePop() { if (!pop) return; pop.remove(); pop = null; document.body.classList.remove("pk-open"); bub.focus({ preventScroll: true }); }
   addEventListener("keydown", ev => { if (ev.key === "Escape" && pop) closePop(); });
-  bub.addEventListener("click", () => { if (ask) { location.hash = "guestbook-write"; return; } openPop(); }); ava.addEventListener("click", openPop);
+  /* 잠깐 다른 말을 했다가 원래 말로 돌아온다 */
+  let holdT = 0, favId = "";
+  function hold(t, ms, onClick) {
+    clearTimeout(holdT); bub.dataset.hold = "1"; bub.textContent = t; bub.classList.add("talk"); bub._click = onClick || null;
+    holdT = setTimeout(() => { delete bub.dataset.hold; bub._click = null; say(prog()); }, ms);
+  }
+  bub.addEventListener("click", () => { if (bub._click) { bub._click(); return; } if (ask) { location.hash = "guestbook-write"; return; } openPop(); });
+  /* 관람객을 여러 번 누르면 간지러워한다 (한 번 누르면 꾸미기) */
+  let taps = [], tapT = 0;
+  ava.addEventListener("click", () => {
+    const now = Date.now(); taps = taps.filter(t => now - t < 1200); taps.push(now);
+    meEl.classList.remove("tickle"); void meEl.offsetWidth; meEl.classList.add("tickle");
+    clearTimeout(tapT);
+    if (taps.length >= 3) { taps = []; hold("간지러워요 😆", 2200); return; }
+    tapT = setTimeout(() => { if (taps.length === 1) openPop(); taps = []; }, 420);
+  });
+  /* 작품을 크게 보고 닫으면, 마음에 들었는지 묻는다 → 누르면 그 그림을 고른 채로 방명록 남기기 */
+  const lbBox = document.getElementById("lightbox");
+  if (lbBox) {
+    let wasOn = false;
+    new MutationObserver(() => {
+      const on = lbBox.classList.contains("on");
+      if (on && !wasOn) { const t = (document.getElementById("lb-title") || {}).textContent || ""; const w = typeof WORKS !== "undefined" && WORKS.find(x => x.title === t); favId = w ? w.id : ""; }
+      if (!on && wasOn && wk.classList.contains("show") && !document.body.classList.contains("guest")) {
+        const id = favId; hold("이 그림 마음에 드세요? ♥", 4500, () => { try { if (id) sessionStorage.setItem("pr-gb-fav", id); } catch {} location.hash = "guestbook-write"; });
+      }
+      wasOn = on;
+    }).observe(lbBox, { attributes: true, attributeFilter: ["class"] });
+  }
   /* 방명록에서 캐릭터를 바꾸면 걷는 관람객도 같이 바뀐다 */
   addEventListener("pr-me", ev => { if (ev.detail && ev.detail !== me) { me = { ...ev.detail }; paintAva(); } });
 })();

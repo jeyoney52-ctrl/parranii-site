@@ -484,3 +484,5 @@ body.pk-open { overflow: hidden; }
 .wk-me .wk-bub { display: block; height: auto; min-height: 0; box-sizing: border-box; padding: 6px 11px; right: 0; width: max-content; max-width: 124px; white-space: normal; text-align: center; word-break: keep-all; line-height: 1.45; }
 .wk-dot span { transition: opacity .25s, background .2s, transform .2s; }
 .wk-dot.near span { opacity: 0; }
+.wk-me.tickle .wk-ava { animation: wktick .35s ease; }
+@keyframes wktick { 0% { transform: rotate(0); } 25% { transform: rotate(-12deg) scale(1.06); } 50% { transform: rotate(10deg); } 75% { transform: rotate(-6deg); } 100% { transform: none; } }

@@ -215,6 +215,7 @@ addEventListener("hashchange", () => {
       const h = location.hash, on = h === "#guestbook" || h === "#guestbook-write"; document.body.classList.toggle("guest", on); page.hidden = !on;
       if (!on) return;
       const mode = h === "#guestbook-write" ? "write" : "list"; page.dataset.mode = mode;
+      if (mode === "write" && !editing) { let f = ""; try { f = sessionStorage.getItem("pr-gb-fav") || ""; sessionStorage.removeItem("pr-gb-fav"); } catch {} if (f && workOf(f)) { fav = f; paintFav(); } }
       page.querySelectorAll(".gb-chip").forEach(c => c.toggleAttribute("aria-current", c.dataset.m === mode));
       if (mode === "list" && editing) setEditing(null);
       if (mode === "list") msg.textContent = msg.dataset.err ? "" : msg.textContent;
