@@ -865,10 +865,25 @@ body.newsp { overflow: auto !important; background: #fff; } body.newsp .menu[hid
 .gb-pick .op { height: auto; font-size: 11px; line-height: 1.3; }
 .gb-note .gb-ava { width: 60px; height: 60px; border-radius: 16px; }
 .gb-note header { gap: 12px; }
+
+/* ───────── 위 메뉴: 묶음과 펼침 ───────── */
+.top nav a { margin-right: -.22em; }
+.nv-g { position: relative; display: flex; }
+.nv-p::after { content: ""; position: absolute; right: -12px; top: 50%; width: 4px; height: 4px; margin-top: -1px; border-right: 1px solid currentColor; border-bottom: 1px solid currentColor; transform: translateY(-50%) rotate(45deg); transition: transform .25s; }
+.nv-sub { position: absolute; left: 50%; top: 100%; transform: translate(-50%, -4px); display: grid; justify-items: center; gap: 12px; padding: 16px 18px 10px; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .22s, transform .22s, visibility 0s .22s; white-space: nowrap; }
+.nv-sub a { font-size: 11px !important; letter-spacing: .2em; opacity: .78; }
+.nv-sub a:hover, .nv-sub a:focus-visible { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
+.nv-g:hover .nv-sub, .nv-g:focus-within .nv-sub { opacity: 1; visibility: visible; pointer-events: auto; transform: translate(-50%, 0); transition: opacity .22s, transform .22s; }
+.nv-g:hover .nv-p::after, .nv-g:focus-within .nv-p::after { transform: translateY(-10%) rotate(225deg); }
+.nv-p { position: relative; } .nv-g { margin-right: 12px; }
+@media (prefers-reduced-motion: reduce) { .nv-sub, .nv-p::after { transition: none; } }
+.menu-sub { display: flex; gap: 22px; margin: -2px 0 14px 4px; }
+.menu nav .menu-sub a { font-family: var(--hlab); font-size: 14px; letter-spacing: .2em; line-height: 1.4; color: #b8b1a4; padding: 2px 0; }
+.gb-grp { flex-basis: 100%; margin: 4px 0 -2px; font-size: 12px; color: var(--mute); } .gb-grp:first-child { margin-top: 0; }
 </style>
 
 <a class="brand home-link" href="./" aria-label="gallery parranii 처음 화면으로 (새로고침)"><img class="b-ink" src="img/logo/parranii-logo.png" alt="" width="490" height="516"><img class="b-wh" src="img/logo/parranii-logo-white.png" alt="" width="490" height="516"></a>
-<header class="top"><a href="./" id="to-top-link" class="home-link">gallery parranii</a><nav aria-label="바로가기"><a href="#posters">works</a><a href="#room">exhibition</a><a href="#news">news</a><a href="#about">about</a><a href="#contact">contact</a><a href="#guestbook">guestbook</a><a id="admin-link" href="#admin" hidden>관리</a></nav><button class="menu-btn" id="menu-btn" type="button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="menu"><i></i><i></i></button></header>
+<header class="top"><a href="./" id="to-top-link" class="home-link">gallery parranii</a><nav aria-label="바로가기"><div class="nv-g"><a href="#posters" class="nv-p">works</a><div class="nv-sub"><a href="#posters">by material</a><a href="#room">all works</a></div></div><a href="#news">news</a><div class="nv-g"><a href="#about" class="nv-p">about</a><div class="nv-sub"><a href="#about">parranii</a><a href="#contact">contact</a></div></div><a href="#guestbook">guestbook</a><a id="admin-link" href="#admin" hidden>관리</a></nav><button class="menu-btn" id="menu-btn" type="button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="menu"><i></i><i></i></button></header>
 
 <!-- ───────── 첫 화면: 검은 화면에 줄로 걸린 전시 포스터 (스크롤하면 배경이 흰색으로) ───────── -->
 <div class="hero-wrap" id="hero-wrap">
@@ -2496,7 +2511,10 @@ function openPhotoEditor({ src, w, onSave, onReplace }) {
 /* ───────── 모바일 햄버거 메뉴 ───────── */
 (() => {
   const A = id => document.getElementById(id), menu = A("menu"), btn = A("menu-btn"), nav = A("menu-nav");
-  function open() { nav.innerHTML = [...document.querySelectorAll(".top nav a")].filter(a => !a.hidden).map(a => `<a href="${esc(a.getAttribute("href"))}" class="${a.id === "admin-link" ? "sm" : ""}">${esc(a.textContent)}</a>`).join("");
+  const lk = (a, cls) => `<a href="${esc(a.getAttribute("href"))}" class="${cls}">${esc(a.textContent)}</a>`;
+  function open() { nav.innerHTML = [...document.querySelector(".top nav").children].filter(el => !el.hidden).map(el => el.classList.contains("nv-g")
+      ? lk(el.querySelector(".nv-p"), "") + `<div class="menu-sub">${[...el.querySelectorAll(".nv-sub a")].map(a => lk(a, "")).join("")}</div>`
+      : lk(el, el.id === "admin-link" ? "sm" : "")).join("");
     menu.hidden = false; btn.setAttribute("aria-expanded", "true"); document.body.classList.add("menu-open"); const f = nav.querySelector("a"); f && f.focus({ preventScroll: true }); }
   function close() { if (menu.hidden) return; menu.hidden = true; btn.setAttribute("aria-expanded", "false"); document.body.classList.remove("menu-open"); }
   btn.addEventListener("click", open); A("menu-x").addEventListener("click", close);
@@ -2823,7 +2841,7 @@ const PrAva = (() => {
   const SKIN = ["#ffe3cc", "#f7cfa6", "#e0a97f", "#b47a55"];
   const CLO = ["#f27b7b", "#7fb8f0", "#7dd3a8", "#f6d365", "#b9a6f0", "#3d4a7a", "#ffffff", "#2f2b37"];
   const PARTS = {
-    hair: ["단발", "짧은 머리", "양갈래", "긴 머리", "뽀글 머리", "똥머리", "삐죽 머리"],
+    hair: ["단발", "짧은 머리", "양갈래", "긴 머리", "뽀글 머리", "똥머리", "삐죽 머리", "가르마", "바가지 머리", "투블럭", "반삭", "올백", "꽁지머리", "짧은 곱슬"],
     hairColor: ["까망", "갈색", "밤색", "금발", "분홍", "하늘", "보라", "하양"],
     skin: ["밝은 피부", "보통 피부", "구릿빛", "갈색 피부"],
     outfit: ["티셔츠", "줄무늬 티", "원피스", "멜빵바지", "후드티", "화가 앞치마", "세일러복", "니트"],
@@ -2866,6 +2884,7 @@ const PrAva = (() => {
     if (hs === 3) layer(rect(ell(S(), 16, 11, 8.5, 7.5), 8, 11, 16, 13), (x, y) => y > 21 && (x + y) % 5 === 0 ? hairD : hair);
     if (hs === 2) { layer(ell(S(), 6.5, 15, 2.5, 3.5), hair); layer(ell(S(), 25.5, 15, 2.5, 3.5), hair); }
     if (hs === 5) layer(ell(S(), 16, 3.5, 3, 2.5), hair);
+    if (hs === 12) layer(pts(rect(S(), 24, 13, 2, 6), [[26, 15], [26, 16], [26, 17], [25, 19], [24, 19]]), (x, y) => y >= 18 ? hairD : hair);
 
     /* 2. 다리 · 신발 */
     const skirt = o === 2 || o === 6;
@@ -2903,15 +2922,29 @@ const PrAva = (() => {
     /* 6. 앞머리 */
     const front = S();
     const cap = ell(S(), 15.5, 10, 8.5, 6.2); cap.forEach(k => { const y = +k.split(",")[1]; if (y <= 8) front.add(k); });
-    rect(front, 8, 9, 16, 1); pts(front, [[8, 10], [23, 10], [9, 10], [22, 10]]);
+    const noBang = hs === 7 || hs === 9 || hs === 10 || hs === 11;
+    if (!noBang) { rect(front, 8, 9, 16, 1); pts(front, [[8, 10], [23, 10], [9, 10], [22, 10]]); }
     if (hs === 0) { rect(front, 7, 9, 3, 9); rect(front, 22, 9, 3, 9); }
     if (hs === 1) { rect(front, 7, 9, 2, 3); rect(front, 23, 9, 2, 3); }
     if (hs === 2) { rect(front, 7, 9, 2, 6); rect(front, 23, 9, 2, 6); }
     if (hs === 3) { rect(front, 7, 9, 2, 13); rect(front, 23, 9, 2, 13); }
     if (hs === 4) { [[8, 6], [11, 4], [15, 3], [20, 4], [23, 6], [7, 10], [24, 10], [7, 14], [24, 14]].forEach(([x, y]) => ell(front, x, y, 2.2, 2.2)); }
     if (hs === 5) { rect(front, 7, 9, 2, 4); rect(front, 23, 9, 2, 4); }
+    if (hs === 7) { rect(front, 8, 9, 7, 1); pts(front, [[8, 10], [9, 10], [10, 10], [11, 10], [8, 11], [23, 9], [23, 10], [22, 9]]); rect(front, 7, 9, 1, 3); rect(front, 24, 9, 1, 2); }
+    if (hs === 8) { rect(front, 8, 9, 16, 2); rect(front, 7, 9, 2, 4); rect(front, 23, 9, 2, 4); }
+    if (hs === 9) { rect(front, 9, 9, 12, 1); pts(front, [[10, 10], [11, 10], [12, 10]]); }
+    if (hs === 10) { [...front].forEach(k => { if (+k.split(",")[1] < 5) front.delete(k); }); rect(front, 8, 9, 16, 1); }
+    if (hs === 11) { ell(front, 13.5, 4.5, 6, 2.6); }
+    if (hs === 12) { rect(front, 7, 9, 2, 3); rect(front, 23, 9, 2, 3); }
+    if (hs === 13) { [[9, 6], [12, 4.5], [15.5, 4], [19, 4.5], [22, 6], [8, 9], [23, 9], [11, 8], [15, 8], [19, 8]].forEach(([x, y]) => ell(front, x, y, 1.8, 1.8)); }
     if (hs === 6) { pts(front, [[10, 3], [11, 2], [14, 2], [15, 1], [19, 2], [20, 3], [22, 4], [9, 4]]); rect(front, 7, 9, 2, 3); rect(front, 23, 9, 2, 3); }
-    layer(front, (x, y) => (y === 5 && x >= 12 && x <= 14) || (y === 6 && x === 11) ? tone(hair, .35) : (y >= 10 && (x <= 8 || x >= 23) ? hairD : hair));
+    const shaved = tone(hair, hc === 7 ? -.15 : .32);
+    layer(front, (x, y) => {
+      if (hs === 9 && (x <= 8 || x >= 23) && y >= 7) return shaved;
+      if (hs === 10) return (x + y) % 3 === 0 ? hairD : (y === 6 && x >= 12 && x <= 14 ? tone(hair, .3) : hair);
+      if (hs === 11 && y <= 7 && (x + 2 * y) % 6 === 0) return tone(hair, .3);
+      if (hs === 7 && (x === 15 || x === 16) && y <= 8 && y >= 4) return hairD;
+      return (y === 5 && x >= 12 && x <= 14) || (y === 6 && x === 11) ? tone(hair, .35) : (y >= 10 && (x <= 8 || x >= 23) ? hairD : hair); });
 
     /* 7. 눈 · 볼 · 입 */
     const ey = 13; set(12, ey, "#2b2430"); set(12, ey - 1, "#2b2430"); set(19, ey, "#2b2430"); set(19, ey - 1, "#2b2430");
@@ -2988,7 +3021,8 @@ const PrAva = (() => {
       const i = PrAva.KEYS.indexOf(part), cur = PrAva.parse(me.s)[i], names = PrAva.PARTS[part];
       if (part === "hairColor" || part === "skin" || part === "color") {
         pick.innerHTML = names.map((n, v) => `<button type="button" role="radio" class="sw" data-v="${v}" style="--c:${(part === "hairColor" ? PrAva.HAIR : part === "skin" ? PrAva.SKIN : PrAva.CLO)[v]}" aria-checked="${v === cur}" aria-label="${n}" title="${n}"></button>`).join(""); return; }
-      pick.innerHTML = names.map((n, v) => { const a = PrAva.parse(me.s); a[i] = v; return `<button type="button" role="radio" class="op" data-v="${v}" aria-checked="${v === cur}" title="${n}">${PrAva.svg(PrAva.join(a), COL[me.c])}<span>${n}</span></button>`; }).join("");
+      const opt = v => { const a = PrAva.parse(me.s); a[i] = v; return `<button type="button" role="radio" class="op" data-v="${v}" aria-checked="${v === cur}" title="${names[v]}">${PrAva.svg(PrAva.join(a), COL[me.c])}<span>${names[v]}</span></button>`; };
+      pick.innerHTML = part === "hair" ? [["짧은 머리", [1, 7, 8, 9, 10, 11, 13, 6]], ["긴 머리", [0, 3, 2, 5, 4, 12]]].map(([t, vs]) => `<p class="gb-grp">${t}</p>${vs.map(opt).join("")}`).join("") : names.map((n, v) => opt(v)).join("");
     };
     const paintMe = pop => {
       ava.innerHTML = PrAva.svg(me.s, COL[me.c]); drawPick();
