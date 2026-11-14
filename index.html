@@ -504,11 +504,12 @@ body.about > .brand, body.contact > .brand, body.admin > .brand { display: block
 .adm-tab { font: inherit; font-size: 14px; padding: 8px 18px; border: 1px solid #d9d7df; border-radius: 999px; background: #fff; cursor: pointer; }
 .adm-tab[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .adm-pane { display: none; }
-#admin[data-tab="exh"] #adm-pane-exh, #admin[data-tab="grp"] #adm-pane-grp, #admin[data-tab="about"] #adm-pane-about, #admin[data-tab="contact"] #adm-pane-contact { display: block; }
+#admin[data-tab="exh"] #adm-pane-exh, #admin[data-tab="grp"] #adm-pane-grp, #admin[data-tab="about"] #adm-pane-about, #admin[data-tab="contact"] #adm-pane-contact, #admin[data-tab="inq"] #adm-pane-inq { display: block; }
 #admin[data-tab="exh"] .adm-bar, #admin[data-tab="exh"] .adm-sync, #admin[data-tab="exh"] #adm-note, #admin[data-tab="exh"] #adm-list,
 #admin[data-tab="contact"] .adm-bar, #admin[data-tab="contact"] .adm-sync, #admin[data-tab="contact"] #adm-note, #admin[data-tab="contact"] #adm-list,
 #admin[data-tab="about"] .adm-bar, #admin[data-tab="about"] .adm-sync, #admin[data-tab="about"] #adm-note, #admin[data-tab="about"] #adm-list,
-#admin[data-tab="grp"] .adm-bar, #admin[data-tab="grp"] .adm-sync, #admin[data-tab="grp"] #adm-note, #admin[data-tab="grp"] #adm-list { display: none !important; }
+#admin[data-tab="grp"] .adm-bar, #admin[data-tab="grp"] .adm-sync, #admin[data-tab="grp"] #adm-note, #admin[data-tab="grp"] #adm-list,
+#admin[data-tab="inq"] .adm-bar, #admin[data-tab="inq"] .adm-sync, #admin[data-tab="inq"] #adm-note, #admin[data-tab="inq"] #adm-list { display: none !important; }
 .adm-lead { margin: 0 0 14px; color: var(--mute); font-size: 14px; line-height: 1.8; max-width: 52em; }
 .adm-pane .adm-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
 .adm-fields .sub { grid-column: 1 / -1; display: grid; gap: 8px; padding-top: 6px; border-top: 1px dashed #e3e1e8; }
@@ -723,6 +724,35 @@ body.about .menu[hidden], body.contact .menu[hidden] { display: none !important;
 .pe-tools { display: flex; gap: 8px; flex-wrap: wrap; }
 .pe-foot { display: flex; justify-content: flex-end; align-items: center; gap: 8px; padding: 14px 20px; border-top: 1px solid #eee; } .pe-msg { margin-right: auto; font-size: 13px; color: var(--mute); }
 @media (max-width: 720px) { .pe-body { grid-template-columns: minmax(0, 1fr); } .pe-stage { max-width: 360px; width: 100%; margin: 0 auto; } }
+
+/* 문의하기 (Contact 페이지) */
+.inq { margin-top: clamp(48px, 7vw, 88px); }
+.inq h2 { margin: 0 0 18px; font-family: var(--hlab); font-weight: 400; font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: var(--mute); }
+.inq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; }
+.inq-grid label { display: grid; gap: 6px; font-size: 13px; color: var(--mute); } .inq-grid .wide { grid-column: 1 / -1; }
+.inq-grid input, .inq-grid textarea { font: inherit; font-size: 16px; color: var(--ink); padding: 12px 14px; border: 1px solid #d9d7df; border-radius: 10px; background: #fff; width: 100%; box-sizing: border-box; }
+.inq-grid textarea { resize: vertical; min-height: 140px; line-height: 1.6; }
+.inq-grid input:focus, .inq-grid textarea:focus { outline: 2px solid var(--ink); outline-offset: 1px; border-color: transparent; }
+.inq-hp { position: absolute !important; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.inq-note { margin: 12px 0 0; font-size: 12.5px; line-height: 1.7; color: var(--mute); } .inq-note a { color: inherit; }
+.inq-foot { display: flex; align-items: center; gap: 14px; margin-top: 16px; flex-wrap: wrap; }
+.inq-send, .inq-again { font: inherit; font-size: 14px; letter-spacing: .08em; padding: 12px 28px; border-radius: 999px; border: 1px solid var(--ink); background: var(--ink); color: #fff; cursor: pointer; }
+.inq-again { background: none; color: var(--ink); } .inq-send:disabled { opacity: .5; cursor: default; }
+.inq-msg { font-size: 13px; color: var(--mute); } .inq-msg[data-err="1"] { color: #c2414b; }
+.inq-done { padding: 22px 0; } .inq-done p { margin: 0 0 14px; font-family: var(--font-display); font-size: 18px; }
+@media (max-width: 640px) { .inq-grid { grid-template-columns: 1fr; } }
+/* 작품 관리 → 문의 */
+.inq-badge { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; margin-left: 4px; border-radius: 999px; background: #c2414b; color: #fff; font-size: 11px; }
+.inq-badge[hidden] { display: none; }
+.inq-when { font-size: 12px; color: var(--mute); margin-left: auto; align-self: center; }
+.inq-list { display: grid; gap: 12px; margin-top: 14px; }
+.inq-item { border: 1px solid #e5e3ea; border-radius: 12px; padding: 16px 18px; background: #fff; }
+.inq-item.new { border-color: #c2414b; box-shadow: 0 0 0 2px rgba(194,65,75,.08); }
+.inq-item header { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; } .inq-item time { margin-left: auto; font-size: 12px; color: var(--mute); }
+.inq-new { font-size: 11px; color: #c2414b; border: 1px solid #c2414b; border-radius: 999px; padding: 1px 8px; }
+.inq-text { margin: 10px 0; white-space: pre-line; line-height: 1.7; font-size: 14.5px; }
+.inq-meta { margin: 0; display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; } .inq-meta a { color: var(--cobalt); }
+#inq-note[data-err="1"] { color: #c2414b; }
 </style>
 
 <a class="brand" href="#top" aria-label="gallery parranii 처음으로"><img class="b-ink" src="img/logo/parranii-logo.png" alt="" width="490" height="516"><img class="b-wh" src="img/logo/parranii-logo-white.png" alt="" width="490" height="516"></a>
@@ -765,6 +795,21 @@ body.about .menu[hidden], body.contact .menu[hidden] { display: none !important;
     <h1 id="ct-t"></h1>
     <div class="ab-body" id="ct-intro"></div>
     <div class="ct-rows" id="ct-rows"></div>
+    <section class="inq" aria-labelledby="inq-t">
+      <h2 id="inq-t">문의하기</h2>
+      <form id="inq-form" novalidate>
+        <div class="inq-grid">
+          <label>성함<input name="name" type="text" autocomplete="name" required></label>
+          <label>연락처<input name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="010-0000-0000"></label>
+          <label class="wide">이메일<input name="email" type="email" autocomplete="email" placeholder="name@example.com"></label>
+          <label class="wide">문의 내용<textarea name="msg" rows="6" required placeholder="관심 있는 작품, 전시, 구입 · 대여 문의 등을 자유롭게 적어 주세요."></textarea></label>
+          <label class="inq-hp" aria-hidden="true">웹사이트<input name="website" tabindex="-1" autocomplete="off"></label>
+        </div>
+        <p class="inq-note">답변 받으실 연락처나 이메일 중 하나는 꼭 적어 주세요. 적어 주신 정보는 문의 답변에만 쓰여요. 파일을 함께 보내시려면 <a href="https://forms.gle/stQhvizMiRZm5pDh8" target="_blank" rel="noopener">구글 폼에서 보내기</a>.</p>
+        <div class="inq-foot"><button class="inq-send" type="submit">보내기</button><span id="inq-msg" class="inq-msg" aria-live="polite"></span></div>
+      </form>
+      <div id="inq-done" class="inq-done" hidden><p>문의가 잘 전달됐어요. 확인하고 연락드릴게요.</p><button type="button" id="inq-again" class="inq-again">다른 문의 보내기</button></div>
+    </section>
     <p class="ab-back"><a href="#top">← 처음으로</a></p>
   </div>
 </section>
@@ -826,6 +871,7 @@ body.about .menu[hidden], body.contact .menu[hidden] { display: none !important;
       <button class="adm-tab" type="button" data-tab="grp" aria-pressed="false">Works 묶음</button>
       <button class="adm-tab" type="button" data-tab="about" aria-pressed="false">About</button>
       <button class="adm-tab" type="button" data-tab="contact" aria-pressed="false">Contact</button>
+      <button class="adm-tab" type="button" data-tab="inq" aria-pressed="false">문의 <span class="inq-badge" id="inq-badge" hidden></span></button>
     </div>
     <div class="adm-pane" id="adm-pane-exh">
       <p class="adm-lead">첫 화면에 걸리는 전시 포스터예요. 포스터 · 제목 · 날짜 · 장소를 직접 쓰고, 전시에 나온 작품을 넣고 뺄 수 있어요. 순서는 위에서부터 첫 화면에 걸려요.</p>
@@ -852,6 +898,12 @@ body.about .menu[hidden], body.contact .menu[hidden] { display: none !important;
           <div class="adm-row"><div class="left"><span class="adm-status"></span></div></div>
         </div>
       </article>
+    </div>
+    <div class="adm-pane" id="adm-pane-inq">
+      <p class="adm-lead">Contact 페이지의 ‘문의하기’로 들어온 내용이에요. 최근 문의가 위에 나와요. 구글 시트에서도 같은 내용을 볼 수 있어요.</p>
+      <div class="adm-actions"><button class="btn primary" type="button" id="inq-refresh">새로고침</button><a class="btn quiet" href="https://docs.google.com/spreadsheets/d/18LiQBcW7E1A_0lXvUlk_LBEVeyG4XnxqHsTI9h085lI/edit" target="_blank" rel="noopener">구글 시트 열기</a><span class="inq-when" id="inq-when"></span></div>
+      <div class="adm-note" id="inq-note" hidden></div>
+      <div class="inq-list" id="inq-list"></div>
     </div>
     <div class="adm-pane" id="adm-pane-contact">
       <p class="adm-lead">Contact 페이지에 나오는 글이에요. 쓰면 저장되고, 위쪽 메뉴의 contact에서 바로 볼 수 있어요. 항목마다 종류(연락처 · 이메일 · 위치 …)를 고르거나 직접 쓰고, 옆 칸에 내용을 적어요. 이메일과 연락처는 누르면 바로 메일 · 전화로 이어지고, https:// 로 시작하면 링크가 돼요.</p>
@@ -2471,5 +2523,81 @@ function openPhotoEditor({ src, w, onSave, onReplace }) {
   addEventListener("keydown", e => { if (e.key === "Escape" && !A("rs").hidden) closeModal(); });
   const go = () => { if (location.hash === "#admin") start(); };
   addEventListener("hashchange", go); go();
+})();
+
+
+/* ───────── 문의하기 ─────────
+   방문자: Contact 페이지 아래 칸에 쓰고 보내면 구글 폼으로 들어가고, 응답은 구글 시트(parranii 문의(응답))에 쌓인다.
+   작가: 작품 관리 → 문의 탭에서 그 시트를 claude.ai의 Google Sheets 연결로 읽어 본다(작가님만 볼 수 있음). */
+(() => {
+  const FORM = "https://docs.google.com/forms/d/e/1FAIpQLScvVe2HHdxsMBOTz2V7pwijecxAU9dG95pk-YoGUpIyiKNIow";
+  const F = { name: "entry.1210748974", phone: "entry.138782799", email: "entry.792571696", msg: "entry.2078323694" };
+  const SHEET = "18LiQBcW7E1A_0lXvUlk_LBEVeyG4XnxqHsTI9h085lI", RANGE = "'설문지 응답 시트1'!A1:F1000";
+  const A = id => document.getElementById(id);
+  const e = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  /* ── 방문자: 문의 보내기 ── */
+  const form = A("inq-form");
+  if (form) {
+    const msg = A("inq-msg"), btn = form.querySelector("button[type=submit]");
+    form.addEventListener("submit", async ev => {
+      ev.preventDefault();
+      const v = k => (form.elements[k]?.value || "").trim();
+      if (v("website")) return; // 자동 등록 프로그램 막기(사람에게는 안 보이는 칸)
+      if (!v("name") || !v("msg")) { msg.textContent = "성함과 문의 내용을 적어 주세요."; msg.dataset.err = "1"; return; }
+      if (!v("phone") && !v("email")) { msg.textContent = "답변 받으실 연락처나 이메일 중 하나는 적어 주세요."; msg.dataset.err = "1"; return; }
+      if (v("email") && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v("email"))) { msg.textContent = "이메일 주소를 다시 확인해 주세요."; msg.dataset.err = "1"; return; }
+      const body = new URLSearchParams({ [F.name]: v("name"), [F.phone]: v("phone"), [F.email]: v("email"), [F.msg]: v("msg") });
+      btn.disabled = true; msg.dataset.err = ""; msg.textContent = "보내는 중…";
+      try {
+        await fetch(FORM + "/formResponse", { method: "POST", mode: "no-cors", body });
+        form.reset(); form.hidden = true; A("inq-done").hidden = false; msg.textContent = "";
+      } catch {
+        /* 이 화면에서 바로 보낼 수 없을 때(claude.ai 미리보기 등): 내용이 채워진 구글 폼을 새 창으로 연다 */
+        window.open(FORM + "/viewform?usp=pp_url&" + body.toString(), "_blank", "noopener");
+        msg.textContent = "새 창에서 열린 문의서의 ‘제출’을 눌러 주세요."; msg.dataset.err = "";
+      } finally { btn.disabled = false; }
+    });
+    form.addEventListener("input", () => { if (msg.dataset.err === "1") { msg.textContent = ""; msg.dataset.err = ""; } });
+    A("inq-again")?.addEventListener("click", () => { A("inq-done").hidden = true; form.hidden = false; });
+  }
+
+  /* ── 작가: 작품 관리 → 문의 탭 ── */
+  const list = A("inq-list"); if (!list) return;
+  const note = A("inq-note"), when = A("inq-when"), SEEN = "pr-inq-seen";
+  let loading = false;
+  const say = (t, err) => { note.hidden = !t; note.textContent = t || ""; note.dataset.err = err ? "1" : ""; };
+  async function load(fresh) {
+    if (loading) return; loading = true; say("문의를 불러오는 중…");
+    const mcp = await (window.claude?.use?.("mcp") || Promise.resolve(null)).catch(() => null);
+    if (!mcp) { say("문의는 claude.ai에 로그인한 상태로 작품 관리를 열면 볼 수 있어요. 구글 시트에서도 바로 볼 수 있어요.", true); loading = false; return; }
+    try {
+      const r = await mcp.callTool("Google Sheets", "get_values", { spreadsheetId: SHEET, range: RANGE }, fresh ? { cache: { refresh: true } } : undefined);
+      const vals = (r.payload && r.payload.values) || [], rows = vals.slice(1).filter(x => x.some(c => String(c || "").trim())).reverse();
+      when.textContent = "불러온 시각 " + new Date(r.cache?.storedAt || Date.now()).toLocaleString("ko-KR", { hour: "2-digit", minute: "2-digit", month: "numeric", day: "numeric" });
+      const seen = +localStorage.getItem(SEEN) || 0, total = rows.length;
+      A("inq-badge").hidden = total <= seen; A("inq-badge").textContent = total - seen;
+      say(total ? "" : "아직 들어온 문의가 없어요.");
+      list.innerHTML = rows.map((x, i) => { const [t, name, phone, email, msgv, file] = x; const isNew = i < total - seen;
+        return `<article class="inq-item${isNew ? " new" : ""}"><header><b>${e(name || "(이름 없음)")}</b>${isNew ? `<span class="inq-new">새 문의</span>` : ""}<time>${e(t)}</time></header>
+          <p class="inq-text">${e(msgv)}</p>
+          <p class="inq-meta">${phone ? `<a href="tel:${e(String(phone).replace(/[^\d+]/g, ""))}">${e(phone)}</a>` : ""}${email ? `<a href="mailto:${e(email)}">${e(email)}</a>` : ""}${file ? `<a href="${e(String(file).split(",")[0].trim())}" target="_blank" rel="noopener">첨부파일 보기</a>` : ""}</p></article>`; }).join("");
+      localStorage.setItem(SEEN, String(total));
+    } catch (err) {
+      const c = err && err.code;
+      say({
+        server_not_connected: "claude.ai에 Google Sheets 연결이 없어요. claude.ai 설정 → 커넥터에서 Google Sheets를 추가해 주세요.",
+        needs_reauth: "Google Sheets 연결이 만료됐어요. claude.ai 설정 → 커넥터에서 Google Sheets를 다시 연결해 주세요.",
+        approval_required: "Google Sheets를 읽으려면 허락이 필요해요. 아래 ‘새로고침’을 눌러 허락해 주세요.",
+        consent_required: "Google Sheets를 읽으려면 허락이 필요해요. 아래 ‘새로고침’을 눌러 허락해 주세요.",
+        not_in_manifest: "이 페이지에서 Google Sheets 사용이 꺼져 있어요. ‘새로고침’을 눌러 다시 허락해 주세요.",
+        tool_error: "시트를 읽지 못했어요. 응답 시트가 지워졌거나 이름이 바뀌었는지 확인해 주세요.",
+        server_unavailable: "구글 쪽 응답이 늦어요. 잠시 뒤 ‘새로고침’을 눌러 주세요.",
+        selection_required: "Google Sheets 연결이 여러 개예요. claude.ai에서 쓸 연결을 하나 골라 주세요."
+      }[c] || "문의를 불러오지 못했어요. 잠시 뒤 ‘새로고침’을 눌러 주세요.", true);
+    } finally { loading = false; }
+  }
+  A("inq-refresh").addEventListener("click", () => load(true));
+  document.querySelectorAll('.adm-tab[data-tab="inq"]').forEach(b => b.addEventListener("click", () => load(false)));
 })();
 </script>
