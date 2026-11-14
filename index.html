@@ -1035,6 +1035,13 @@ body.pk-open { overflow: hidden; }
 @media (max-width: 720px) and (prefers-reduced-motion: reduce) { .mw, .mw.walking .mw-ava, .mw-bub.in { transition: none; animation: none; } }
 @media (max-width: 720px) { .mw-bub { left: -20px; } .mw-bub.r { right: -20px; } }
 html, body { margin: 0; } /* 검은 첫 화면 · 흰 Works가 화면 끝까지 꽉 차게 */
+
+/* 꾸미기 창: 저장은 맨 위에, 스크롤해도 따라오게 */
+.wkp-h { position: sticky; top: -20px; z-index: 2; margin: -20px -20px 0; padding: 16px 20px 12px; background: #fbfaf7; border-bottom: 1px solid #ebe8f0; gap: 10px; }
+.wkp-tt { display: grid; gap: 2px; margin-right: auto; } .wkp-tt .wkp-note { margin: 0; }
+.wkp-h .wkp-x { margin-left: 0; }
+.wkp-h .wkp-save { padding: 9px 22px; font-size: 14px; }
+@media (max-width: 720px) { .wkp-h { top: -16px; margin: -16px -14px 0; padding: 14px 14px 10px; } }
 </style>
 
 <a class="brand home-link" href="./" aria-label="gallery parranii 처음 화면으로 (새로고침)"><img class="b-ink" src="img/logo/parranii-logo.png" alt="" width="490" height="516"><img class="b-wh" src="img/logo/parranii-logo-white.png" alt="" width="490" height="516"></a>
@@ -3709,10 +3716,10 @@ addEventListener("hashchange", () => {
   function openPop() {
     if (pop) return; draft = { ...me }; part = "hair";
     pop = document.createElement("div"); pop.className = "wkp"; pop.setAttribute("role", "dialog"); pop.setAttribute("aria-modal", "true"); pop.setAttribute("aria-label", "내 관람객 꾸미기");
-    pop.innerHTML = `<div class="wkp-in"><div class="wkp-h"><b>내 관람객 꾸미기</b><button type="button" class="wkp-x" aria-label="닫기">✕</button></div>
+    pop.innerHTML = `<div class="wkp-in"><div class="wkp-h"><div class="wkp-tt"><b>내 관람객 꾸미기</b><span class="wkp-note">방명록 캐릭터에도 같이 쓰여요</span></div><button type="button" class="inq-send wkp-save">저장</button><button type="button" class="wkp-x" aria-label="닫기">✕</button></div>
       <div class="wkp-body"><div class="wkp-me"><div class="wkp-big gb-ava big"></div><button type="button" class="gb-dice wkp-dice"><span aria-hidden="true">🎲</span> 랜덤</button></div>
         <div class="gb-dress"><div class="gb-tabs wkp-tabs" role="tablist">${TABS.map(([k, l]) => `<button type="button" role="tab" data-p="${k}">${l}</button>`).join("")}</div><div class="gb-pick wkp-pick"></div></div></div>
-      <div class="wkp-foot"><span class="wkp-note">방명록 캐릭터에도 같이 쓰여요</span><button type="button" class="gb-mini" data-x>취소</button><button type="button" class="inq-send wkp-save">저장</button></div></div>`;
+</div>`;
     document.body.appendChild(pop); document.body.classList.add("pk-open");
     paintDraft(false);
     pop.querySelector(".wkp-tabs").addEventListener("click", ev => { const b = ev.target.closest("[data-p]"); if (b) { part = b.dataset.p; drawPick(); } });
