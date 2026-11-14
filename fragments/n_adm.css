@@ -486,3 +486,9 @@ body.pk-open { overflow: hidden; }
 .wk-dot.near span { opacity: 0; }
 .wk-me.tickle .wk-ava { animation: wktick .35s ease; }
 @keyframes wktick { 0% { transform: rotate(0); } 25% { transform: rotate(-12deg) scale(1.06); } 50% { transform: rotate(10deg); } 75% { transform: rotate(-6deg); } 100% { transform: none; } }
+
+/* 말풍선 = 옷 색 */
+.wk-bub, .wk-bub.talk { background: var(--bub, #fff); }
+.wk-bub:hover { filter: brightness(.97); }
+.wk-me .wk-bub { text-wrap: balance; }
+.wk-me .wk-bub { white-space: pre-line; max-width: 150px; }

@@ -17,7 +17,17 @@
     <div class="wk-me" id="wk-me"><button type="button" class="wk-bub" id="wk-bub" aria-label="내 관람객 꾸미기">DIY ME!</button><button type="button" class="wk-ava" id="wk-ava" aria-label="내 관람객 꾸미기"></button></div>`;
   document.body.appendChild(wk);
   const meEl = wk.querySelector("#wk-me"), ava = wk.querySelector("#wk-ava"), bub = wk.querySelector("#wk-bub"), dots = wk.querySelector(".wk-dots");
-  const paintAva = () => { ava.innerHTML = PrAva.svg(me.s, ""); };
+  /* 말풍선 배경은 관람객 옷 색을 연하게 */
+  const tint = (hex, k) => { const n = parseInt(hex.slice(1), 16), f = v => Math.round(v + (255 - v) * k); return `rgb(${f(n >> 16)}, ${f((n >> 8) & 255)}, ${f(n & 255)})`; };
+  const paintAva = () => { ava.innerHTML = PrAva.svg(me.s, ""); const c = PrAva.CLO[PrAva.parse(me.s)[PrAva.KEYS.indexOf("color")]] || "#ffffff"; bub.style.setProperty("--bub", c.toLowerCase() === "#ffffff" ? "#ffffff" : tint(c, .72)); };
+  /* 말 넣기: 이모티콘이 혼자 다음 줄로 떨어지지 않게 앞 낱말에 붙이고, 줄이 나뉘면 말풍선 폭을 글줄에 맞춰 좁힌다 */
+  function setText(t) {
+    bub.textContent = String(t).replace(/ (?=\p{Extended_Pictographic})/gu, "\u00a0");
+    bub.style.width = "";
+    requestAnimationFrame(() => { const r = document.createRange(); r.selectNodeContents(bub); const rs = [...r.getClientRects()];
+      if (rs.length > 1) { const w = Math.max(...rs.map(x => x.right)) - Math.min(...rs.map(x => x.left)); const cs = getComputedStyle(bub);
+        bub.style.width = Math.ceil(w + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderRightWidth) + 1) + "px"; } });
+  }
   paintAva();
 
   /* 위치: 구간(처음 → works → all works → 끝)마다 길을 같은 길이로 나눠서, 그 구간을 지나는 만큼 내려간다 */
@@ -51,7 +61,7 @@
     if (bub.dataset.hold) return;
     let t, a = false;
     const end = p > .9 && scrollY >= maxY() - 120;
-    if (end) { t = wrote() ? "끝까지 봐 주셨네요! 👏" : "끝까지 봐 주셨네요! 👏 방명록도 남겨주실래요? 💌"; a = !wrote(); }
+    if (end) { t = wrote() ? "끝까지 봐 주셨네요! 👏" : "끝까지 봐 주셨네요! 👏\n방명록도 남겨주실래요? 💌"; a = !wrote(); }
     else if (p > .8 && !wrote()) { t = "방명록도 남겨주실거죠? 💌"; a = true; }
     else if (!diy()) t = "DIY ME!";
     else if (sleepy) t = "쉬었다 가요 💤";
@@ -59,7 +69,7 @@
     else if (p >= .3) t = "포스터를 눌러 보세요 👆";
     else t = greet();
     ask = a;
-    if (bub.textContent !== t) { bub.textContent = t; bub.classList.toggle("talk", t !== "DIY ME!"); }
+    if (bub.dataset.t !== t) { bub.dataset.t = t; setText(t); bub.classList.toggle("talk", t !== "DIY ME!"); }
     bub.setAttribute("aria-label", a ? "방명록 남기러 가기" : "내 관람객 꾸미기");
   }
   function place() {
@@ -134,7 +144,7 @@
   /* 잠깐 다른 말을 했다가 원래 말로 돌아온다 */
   let holdT = 0, favId = "";
   function hold(t, ms, onClick) {
-    clearTimeout(holdT); bub.dataset.hold = "1"; bub.textContent = t; bub.classList.add("talk"); bub._click = onClick || null;
+    clearTimeout(holdT); bub.dataset.hold = "1"; bub.dataset.t = t; setText(t); bub.classList.add("talk"); bub._click = onClick || null;
     holdT = setTimeout(() => { delete bub.dataset.hold; bub._click = null; say(prog()); }, ms);
   }
   bub.addEventListener("click", () => { if (bub._click) { bub._click(); return; } if (ask) { location.hash = "guestbook-write"; return; } openPop(); });
