@@ -10,7 +10,7 @@
   const e = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const load = () => { try { const v = JSON.parse(localStorage.getItem("pr-gb-me") || "null"); if (v && PrAva.valid(v.s) && BG[v.c]) return v; } catch {} return null; };
   let me = load() || { s: PrAva.random(), c: rnd(BK) };
-  const SECS = [["top", null, "처음"], ["posters", "posters", "works"], ["room", "room", "all works"]];
+  const SECS = [["top", null, "top"], ["posters", "posters", "works"], ["room", "room", "all works"]];
 
   const wk = document.createElement("div"); wk.className = "wk"; wk.id = "wk";
   wk.innerHTML = `<span class="wk-line" aria-hidden="true"></span><div class="wk-dots"></div>
@@ -20,18 +20,50 @@
   const paintAva = () => { ava.innerHTML = PrAva.svg(me.s, ""); };
   paintAva();
 
-  /* 위치: 스크롤한 만큼 길을 따라 내려간다 */
+  /* 위치: 구간(처음 → works → all works → 끝)마다 길을 같은 길이로 나눠서, 그 구간을 지나는 만큼 내려간다 */
   let idle = 0;
+  const STOPS = [0, .32, .64, 1]; // 처음 · works · all works · 끝 이 길 위에 놓이는 자리
   const maxY = () => Math.max(1, document.documentElement.scrollHeight - innerHeight);
+  const secY = () => [0, ...["posters", "room"].map(id => { const el = document.getElementById(id); return el ? el.getBoundingClientRect().top + scrollY : 0; }), maxY()];
+  function prog() {
+    const ys = secY(), y = Math.min(scrollY, ys[3]);
+    for (let i = 0; i < 3; i++) if (y <= ys[i + 1] || i === 2) { const span = Math.max(1, ys[i + 1] - ys[i]); return STOPS[i] + (STOPS[i + 1] - STOPS[i]) * Math.min(1, Math.max(0, (y - ys[i]) / span)); }
+    return 0;
+  }
   function drawDots() {
     const H = wk.clientHeight; if (!H) return;
-    dots.innerHTML = SECS.map(([k, id, label]) => { const el = id && document.getElementById(id); const t = el ? Math.min(1, Math.max(0, (el.getBoundingClientRect().top + scrollY) / maxY())) : 0;
-      return `<button type="button" class="wk-dot" data-k="${k}" style="top:${(t * H).toFixed(1)}px" title="${e(label)}"><span>${e(label)}</span></button>`; }).join("");
+    dots.innerHTML = SECS.map(([k, id, label], i) => `<button type="button" class="wk-dot" data-k="${k}" style="top:${(STOPS[i] * H).toFixed(1)}px" title="${e(label)}"><span>${e(label)}</span></button>`).join("");
+  }
+  /* 꽤 내려와서 작품을 많이 봤으면, 방명록을 부탁한다 (이미 남긴 사람에게는 묻지 않음) */
+  let ask = false, idleT = 0, sleepy = false;
+  const LS = k => { try { return localStorage.getItem(k); } catch { return null; } };
+  const wrote = () => !!LS("pr-gb-last");
+  const diy = () => !!LS("pr-wk-diy");               // ‘DIY ME’에서 저장을 한 번이라도 했는지
+  let visits = 1; try { visits = (+localStorage.getItem("pr-wk-visits") || 0) + 1; localStorage.setItem("pr-wk-visits", String(visits)); } catch {}
+  /* 상황별 말풍선 */
+  function say(p) {
+    if (bub.dataset.hold) return;
+    let t, a = false;
+    if (p > .8 && !wrote()) { t = "방명록도 남겨주실거죠? 💌"; a = true; }
+    else if (!diy()) t = "DIY ME!";
+    else if (sleepy) t = "쉬었다 가요 💤";
+    else if (scrollY >= maxY() - 40 && p > .9) t = "끝까지 봐 주셨네요! 👏";
+    else if (p >= .64) t = wrote() ? "다녀가 줘서 고마워요 💕" : "천천히 보고 가요 ☕";
+    else if (p >= .3) t = "포스터를 눌러 보세요 👆";
+    else t = visits > 1 ? "또 오셨네요! 반가워요 🙌" : "안녕하세요! 👋";
+    ask = a;
+    if (bub.textContent !== t) { bub.textContent = t; bub.classList.toggle("talk", t !== "DIY ME!"); }
+    bub.setAttribute("aria-label", a ? "방명록 남기러 가기" : "내 관람객 꾸미기");
   }
   function place() {
     const H = wk.clientHeight; if (!H) return;
-    const p = Math.min(1, Math.max(0, scrollY / maxY()));
+    const p = prog();
     meEl.style.transform = `translateY(${(p * H).toFixed(1)}px)`;
+    sleepy = false; clearTimeout(idleT); idleT = setTimeout(() => { sleepy = true; say(prog()); }, 25000);
+    say(p);
+    const curK = p >= STOPS[2] - .001 ? "room" : p >= STOPS[1] - .001 ? "posters" : "top";
+    const ay = p * H; // 관람객 바로 위 이정표는 말풍선과 겹치지 않게 잠깐 숨긴다
+    dots.querySelectorAll(".wk-dot").forEach(d => { d.classList.toggle("on", d.dataset.k === curK); const dy = ay - parseFloat(d.style.top); d.classList.toggle("near", dy > -20 && dy < 130); });
     meEl.classList.add("walking"); clearTimeout(idle); idle = setTimeout(() => meEl.classList.remove("walking"), 380);
   }
   dots.addEventListener("click", ev => { const b = ev.target.closest(".wk-dot"); if (!b) return; const id = SECS.find(s => s[0] === b.dataset.k)[1];
@@ -84,14 +116,15 @@
       me = { ...draft }; try { localStorage.setItem("pr-gb-me", JSON.stringify(me)); } catch {}
       dispatchEvent(new CustomEvent("pr-me", { detail: me }));
       closePop(); paintAva(); meEl.classList.remove("saved"); void meEl.offsetWidth; meEl.classList.add("saved");
-      bub.textContent = "고마워요 💕"; setTimeout(() => { bub.textContent = "DIY ME!"; }, 2600);
+      try { localStorage.setItem("pr-wk-diy", "1"); } catch {}
+      bub.dataset.hold = "1"; bub.textContent = "짠! 어때요? ✨"; bub.classList.add("talk"); setTimeout(() => { delete bub.dataset.hold; say(prog()); }, 2600);
     });
     pop.addEventListener("click", ev => { if (ev.target === pop || ev.target.closest(".wkp-x") || ev.target.closest("[data-x]")) closePop(); });
     setTimeout(() => pop && pop.querySelector(".wkp-save").focus({ preventScroll: true }), 50);
   }
   function closePop() { if (!pop) return; pop.remove(); pop = null; document.body.classList.remove("pk-open"); bub.focus({ preventScroll: true }); }
   addEventListener("keydown", ev => { if (ev.key === "Escape" && pop) closePop(); });
-  bub.addEventListener("click", openPop); ava.addEventListener("click", openPop);
+  bub.addEventListener("click", () => { if (ask) { location.hash = "guestbook-write"; return; } openPop(); }); ava.addEventListener("click", openPop);
   /* 방명록에서 캐릭터를 바꾸면 걷는 관람객도 같이 바뀐다 */
   addEventListener("pr-me", ev => { if (ev.detail && ev.detail !== me) { me = { ...ev.detail }; paintAva(); } });
 })();

@@ -52,7 +52,8 @@
   let lastSig = null;
   onWorks(() => {
     buildYears(); const next = filtered(), sig = next.map(w => w.id + "\u0002" + sigOf(w)).join("\u0003");
-    if (sig === lastSig) return; const first = lastSig === null; lastSig = sig; current = next;
+    if (sig === lastSig) { current = next; return; } // 내용이 같아도 새 작품 목록으로 바꿔 둬야 번호(No.)가 0으로 나오지 않는다
+    const first = lastSig === null; lastSig = sig; current = next;
     if (first) shown = PAGE(); render(false);
   });
 })();
