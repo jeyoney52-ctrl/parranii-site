@@ -2274,6 +2274,9 @@ function openPhotoEditor({ src, w, onSave, onReplace }) {
       el.style.transform = `translate(${(x - w / 2).toFixed(1)}px, ${((H - h) / 2).toFixed(1)}px) perspective(1200px) rotateY(${clampN(-off * 38, -52, 52).toFixed(1)}deg) scale(${(1 - Math.min(a, 2.5) * .12).toFixed(3)})`;
       el.style.zIndex = 50 - Math.round(a * 10); el.style.opacity = (1 - Math.min(a, 3) * .2).toFixed(2); el.style.filter = a > .4 ? `brightness(${(1 - Math.min(a, 2) * .1).toFixed(2)})` : ""; el.style.pointerEvents = a > 2.6 ? "none" : ""; }); }
   addEventListener("resize", flLayout);
+  /* 다른 페이지(News · About · Guestbook …)에 있는 동안 숨겨져서 크기가 0으로 잡힌 포스터를, 돌아오면 다시 맞춘다 */
+  addEventListener("hashchange", () => { requestAnimationFrame(flLayout); setTimeout(flLayout, 300); });
+  if ("ResizeObserver" in window) new ResizeObserver(() => { const st = $("fl-stage"); if (st && st.clientWidth && fcards.some(el => !el.offsetWidth)) flLayout(); }).observe(board);
   onWorks(buildBoard); onGroups(buildBoard);
   function openGroup(i, from) { const g = GROUPS[i]; if (!g) return;
     openDetail({ img: g.src, k: `Works ${p2(i + 1)} / ${p2(GN())}${g.en ? "  ·  " + g.en : ""}`, title: g.name, desc: [g.desc].filter(Boolean), list: byGroup[g.id] || [], empty: "이 묶음에는 아직 작품이 없어요." }, from); }
@@ -3032,6 +3035,13 @@ const PrAva = (() => {
   return { svg, random, parse, join, valid, PARTS, KEYS, CLO, HAIR, SKIN };
 })();
 
+
+/* 다른 페이지에서 works 메뉴(by material · all works)를 누르면, 첫 화면이 다시 보인 뒤에 그 자리로 내려간다 */
+addEventListener("hashchange", () => {
+  const id = location.hash.slice(1); if (id !== "posters" && id !== "room") return;
+  const go = () => { const el = document.getElementById(id); if (el && Math.abs(el.getBoundingClientRect().top) > 2) el.scrollIntoView(); };
+  requestAnimationFrame(() => requestAnimationFrame(go)); setTimeout(go, 350);
+});
 
 /* ───────── 방명록 (Guestbook) ─────────
    방문자: #guestbook 페이지에서 프로필(동물 · 색)을 고르거나 주사위로 랜덤으로 뽑고 한마디를 남긴다.
