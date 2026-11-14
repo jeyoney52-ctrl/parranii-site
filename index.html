@@ -937,6 +937,21 @@ body.pk-open { overflow: hidden; }
 .gb-pw { width: min(360px, 100%); background: #fff; border-radius: 18px; padding: 20px; display: grid; gap: 12px; box-shadow: 0 30px 80px rgba(0,0,0,.25); }
 .gb-pw p { margin: 0; font-size: 14px; line-height: 1.6; } .gb-pw input { font: inherit; font-size: 16px; padding: 10px 14px; border: 1px solid #d9d7df; border-radius: 12px; }
 .gb-pw div { display: flex; gap: 8px; justify-content: flex-end; } .gb-mini.strong2 { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+/* 방명록: 보기 / 남기기 나누기 */
+.gb-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 24px; margin-bottom: clamp(28px, 4vw, 44px); }
+.gb-head .gb-intro { margin: 0; }
+#gb-page[data-mode="list"] .gb-i-write, #gb-page[data-mode="write"] .gb-i-list { display: none; }
+.gb-switch { display: flex; gap: 8px; flex-wrap: wrap; }
+.gb-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; padding: 10px 18px; border-radius: 999px; border: 1px solid var(--ink); color: var(--ink); text-decoration: none; background: #fff; white-space: nowrap; }
+.gb-chip[aria-current] { background: var(--ink); color: #fff; }
+.gb-cnt { font-family: var(--hlab); font-size: 12px; opacity: .7; } .gb-cnt:empty { display: none; }
+#gb-page[data-mode="list"] .gb-form { display: none; }
+#gb-page[data-mode="write"] .gb-rank, #gb-page[data-mode="write"] .gb-board, #gb-page[data-mode="write"] .gb-more { display: none !important; }
+#gb-page[data-mode="list"] .gb-rank { margin-top: 0; }
+.gb-empty .gb-chip { margin-top: 14px; }
+.gb-done { margin: 0 0 8px; padding: 10px 16px; border-radius: 12px; background: #fff4c9; font-size: 14px; text-align: center; animation: gbin .5s ease; }
+.gb-mine.pw { position: absolute; top: 14px; right: 14px; margin: 0; }
 </style>
 
 <a class="brand home-link" href="./" aria-label="gallery parranii 처음 화면으로 (새로고침)"><img class="b-ink" src="img/logo/parranii-logo.png" alt="" width="490" height="516"><img class="b-wh" src="img/logo/parranii-logo-white.png" alt="" width="490" height="516"></a>
@@ -990,7 +1005,10 @@ body.pk-open { overflow: hidden; }
 <section class="about-page" id="gb-page" hidden aria-labelledby="gb-t">
   <div class="ab-in">
     <h1 id="gb-t">Guestbook</h1>
-    <p class="ab-body gb-intro">나만의 캐릭터를 꾸미고, 다녀가신 흔적을 한 줄 남겨 주세요.</p>
+    <div class="gb-head">
+      <p class="ab-body gb-intro"><span class="gb-i-list">다녀가신 분들이 남긴 이야기와, 마음에 든 그림이에요.</span><span class="gb-i-write">나만의 캐릭터를 꾸미고, 다녀가신 흔적을 한 줄 남겨 주세요.</span></p>
+      <div class="gb-switch" role="group" aria-label="방명록 보기 · 남기기"><a href="#guestbook" class="gb-chip" data-m="list">방명록 보기 <span class="gb-cnt" id="gb-cnt"></span></a><a href="#guestbook-write" class="gb-chip" data-m="write">✏️ 방명록 남기기</a></div>
+    </div>
     <form class="gb-form" id="gb-form" novalidate>
       <div class="gb-me">
         <button type="button" class="gb-ava big" id="gb-ava" aria-label="프로필 랜덤으로 바꾸기"></button>
@@ -1211,7 +1229,7 @@ body.pk-open { overflow: hidden; }
 <nav class="dock" id="dock" aria-label="페이지 이동">
   <i class="dock-bar" id="dock-bar" aria-hidden="true"></i>
   <div class="dock-nav">
-    <button type="button" data-to="top">맨 위</button>
+    <button type="button" data-to="top">top</button>
     <button type="button" data-to="posters">작품</button>
     <button type="button" data-to="room">한 점씩</button>
   </div>
@@ -2245,7 +2263,7 @@ function openPhotoEditor({ src, w, onSave, onReplace }) {
       const hb = hero.getBoundingClientRect(), bb = BAR.getBoundingClientRect();
       const f = (bb.top + bb.height / 2 - hb.top) / Math.max(1, hb.height), g = (f + 2 * p) / 3, t = clampN((g - .3) / .36, 0, 1);
       { /* 머리글 자리(화면 맨 위)의 배경이 어두우면 흰 로고 */ const fh = 40 / Math.max(1, hb.height), gh = (fh + 2 * p) / 3, th = clampN((gh - .3) / .36, 0, 1);
-        const onHero = hb.bottom > 60 && !["#about", "#contact", "#guestbook", "#news", "#admin"].includes(location.hash) && !document.body.classList.contains("about") && !document.body.classList.contains("contact") && !document.body.classList.contains("guest") && !document.body.classList.contains("newsp");
+        const onHero = hb.bottom > 60 && !["#about", "#contact", "#guestbook", "#guestbook-write", "#news", "#admin"].includes(location.hash) && !document.body.classList.contains("about") && !document.body.classList.contains("contact") && !document.body.classList.contains("guest") && !document.body.classList.contains("newsp");
         document.body.classList.toggle("hdr-dark", onHero && th < .5); }
       BAR.classList.toggle("dark", t > .5); BAR.classList.toggle("off", raw > .42 || document.body.classList.contains("about") || document.body.classList.contains("contact") || document.body.classList.contains("guest") || document.body.classList.contains("newsp") || location.hash === "#admin"); }
     const f = smooth(.5, .86, p); hero.style.setProperty("--hf", (1 - f).toFixed(3)); hero.style.setProperty("--hr", (1 - f).toFixed(3));
@@ -3147,9 +3165,9 @@ addEventListener("hashchange", () => {
         return `<button type="button" class="gb-rk" data-work="${e(id)}"><span class="gb-rk-n">${i + 1}</span><img src="${e(thumbSrc(w))}" alt="" loading="lazy"><span class="gb-rk-t">No. ${wNo(w)}<b>${e(w.title || "")}</b></span><span class="gb-rk-c">♥ ${k}</span></button>`; }).join("");
     };
     const draw = () => {
-      if (!items) return; drawRank();
+      if (!items) return; drawRank(); A("gb-cnt").textContent = items.length ? items.length : "";
       board.innerHTML = items.length ? items.slice(0, shown).map(x => note(x, x.fresh)).join("")
-        : `<p class="gb-empty"><span aria-hidden="true">🌱</span>아직 남겨진 글이 없어요. 첫 번째 방명록을 남겨 주세요!</p>`;
+        : `<p class="gb-empty"><span aria-hidden="true">🌱</span>아직 남겨진 글이 없어요.<br><a class="gb-chip" href="#guestbook-write">✏️ 첫 번째 방명록 남기기</a></p>`;
       items.forEach(x => delete x.fresh); more.hidden = items.length <= shown;
     };
     more.addEventListener("click", () => { shown += 24; draw(); });
@@ -3207,7 +3225,8 @@ addEventListener("hashchange", () => {
       editing = x;
       A("gb-editbar").hidden = !x; btn.textContent = x ? "고치기" : "남기기";
       if (x) { form.elements.name.value = x.name || ""; ta.value = x.msg || ""; fav = x.w || ""; if (PrAva.valid(x.s)) me.s = x.s; if (COL[x.c]) me.c = x.c; paintMe(false); paintFav(); A("gb-count").textContent = ta.value.length + " / 140";
-        form.scrollIntoView({ behavior: "smooth", block: "start" }); setTimeout(() => ta.focus({ preventScroll: true }), 400); }
+        if (location.hash !== "#guestbook-write") location.hash = "guestbook-write";
+        setTimeout(() => { form.scrollIntoView({ behavior: "smooth", block: "start" }); ta.focus({ preventScroll: true }); }, 120); }
       else { ta.value = ""; fav = ""; paintFav(); A("gb-count").textContent = "0 / 140"; }
     };
     A("gb-editx").addEventListener("click", () => { setEditing(null); msg.textContent = ""; });
@@ -3234,6 +3253,13 @@ addEventListener("hashchange", () => {
       d.addEventListener("click", ev => { if (ev.target === d || ev.target.closest("[data-x]")) done(null); });
       d.addEventListener("keydown", ev => { if (ev.key === "Escape") done(null); });
     });
+    /* 저장한 뒤에는 방명록 보기로 가서, 방금 쓴 쪽지를 보여 준다 */
+    const showDone = t => {
+      location.hash = "guestbook";
+      setTimeout(() => { draw(); const n = board.querySelector(".gb-note.fresh") || board.querySelector(".gb-note");
+        const tip = document.createElement("p"); tip.className = "gb-done"; tip.textContent = t; board.before(tip); setTimeout(() => tip.remove(), 4000);
+        n && n.scrollIntoView({ behavior: "smooth", block: "center" }); }, 150);
+    };
     const post = async body => { const r = await fetch(SCRIPT, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body) }); const j = await r.json().catch(() => null); if (!r.ok || !j) throw new Error("status " + r.status); return j; };
     const newKey = () => { const a = new Uint8Array(18); crypto.getRandomValues(a); return [...a].map(b => b.toString(16).padStart(2, "0")).join(""); };
 
@@ -3250,8 +3276,8 @@ addEventListener("hashchange", () => {
         try { const j = await post({ type: "guestbook_edit", id: editing.id, key, name, msg: text, sticker: me.s, color: me.c, work: fav });
           if (!j.ok) throw new Error(j.error);
           try { const m = MINE(); m[editing.id] = key; localStorage.setItem("pr-gb-mine", JSON.stringify(m)); } catch {}
-          Object.assign(editing, { name, msg: text, s: me.s, c: me.c, w: fav, e: 1, fresh: true }); delete editing.key; setEditing(null); draw(); msg.textContent = "고쳤어요! ✏️";
-          document.querySelector(".gb-note.fresh")?.scrollIntoView({ behavior: "smooth", block: "center" }); }
+          Object.assign(editing, { name, msg: text, s: me.s, c: me.c, w: fav, e: 1, fresh: true }); delete editing.key; setEditing(null); msg.textContent = "";
+          showDone("고쳤어요! ✏️"); }
         catch (err) { console.warn("방명록 고치기 실패:", err); bad(String(err && err.message) === "not yours" ? "비밀번호가 맞지 않아요. 다시 확인해 주세요." : "고치지 못했어요. 잠시 뒤 다시 눌러 주세요."); if (String(err && err.message) === "not yours") setEditing(null); }
         btn.disabled = false; return;
       }
@@ -3265,14 +3291,20 @@ addEventListener("hashchange", () => {
         if (!j.ok) throw new Error(j.error);
         try { localStorage.setItem("pr-gb-last", String(Date.now())); if (j.id) { const m = MINE(); m[j.id] = key; localStorage.setItem("pr-gb-mine", JSON.stringify(m)); } } catch {}
         (items = items || []).unshift({ id: j.id, t: new Date().toISOString(), name, msg: text, s: me.s, c: me.c, w: fav, fresh: true }); draw();
-        ta.value = ""; form.elements.pw.value = ""; fav = ""; paintFav(); A("gb-count").textContent = "0 / 140"; msg.textContent = "남겨 주셔서 고마워요! 💌";
+        ta.value = ""; form.elements.pw.value = ""; fav = ""; paintFav(); A("gb-count").textContent = "0 / 140"; msg.textContent = "";
+        showDone("남겨 주셔서 고마워요! 💌");
       } catch (err) { console.warn("방명록 저장 실패:", err); bad("남기지 못했어요. 잠시 뒤 다시 눌러 주세요."); }
       finally { btn.disabled = false; }
     });
 
     function route() {
-      const on = location.hash === "#guestbook"; document.body.classList.toggle("guest", on); page.hidden = !on;
-      if (on) { scrollTo(0, 0); document.title = "Guestbook · Gallery Parranii"; load(); }
+      const h = location.hash, on = h === "#guestbook" || h === "#guestbook-write"; document.body.classList.toggle("guest", on); page.hidden = !on;
+      if (!on) return;
+      const mode = h === "#guestbook-write" ? "write" : "list"; page.dataset.mode = mode;
+      page.querySelectorAll(".gb-chip").forEach(c => c.toggleAttribute("aria-current", c.dataset.m === mode));
+      if (mode === "list" && editing) setEditing(null);
+      if (mode === "list") msg.textContent = msg.dataset.err ? "" : msg.textContent;
+      scrollTo(0, 0); document.title = (mode === "write" ? "방명록 남기기" : "Guestbook") + " · Gallery Parranii"; load();
     }
     addEventListener("hashchange", route); route();
   }
