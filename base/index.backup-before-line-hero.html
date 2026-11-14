@@ -1,0 +1,1710 @@
+<title>Gallery Parranii</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Italiana&display=swap">
+<style>
+/* Layout: 검은 화면 손전등 → 아이의 책이 커지며 펼쳐지고 물감이 번지는 인트로 → 회전 카드 / 우표 콜라주 → 한 점씩 크게 보는 전시실, 오른쪽엔 계단을 오르내리는 아이 */
+:root {
+  --paper: #f8f8f5;      /* 전시실 벽 */
+  --ink: #1f1d2b;        /* 먹빛 남색 */
+  --mute: #6d6b7b;       /* 캡션 회색 (남색 기운) */
+  --cobalt: #2c3ea0;     /* 작품 속 코발트 */
+  --night: #0a0a0d;      /* 인트로 어둠 */
+  --chalk: #f1ede4;      /* 어둠 속 선 */
+  --font-display: "Gowun Batang", "Nanum Myeongjo", serif;
+  --font-body: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-latin: "Italiana", "Didot", "Bodoni 72", serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--font-body); font-size: 15px; line-height: 1.7;
+  overflow-x: hidden;
+}
+body.locked { overflow: hidden; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--cobalt); outline-offset: 3px; }
+
+/* ───────── 인트로: 선으로 그린 아이가 책을 펼치고 넘기는 모션그래픽 ───────── */
+.intro {
+  position: relative; height: 100vh; height: 100svh; min-height: 560px;
+  overflow: hidden; background: #fbfaf6;
+}
+.paper-bg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.figure {
+  position: absolute; left: 50%; top: 44%; width: min(96vw, 84vh); aspect-ratio: 1;
+  transform: translate(-50%, -50%) scale(var(--cam, 1));
+  transform-origin: 44.7% 50%; overflow: visible; pointer-events: none;
+  --line: #f3e9d6; --pagefill: #000;
+  -webkit-mask: radial-gradient(circle var(--fr, 0px) at var(--fmx, 50%) var(--fmy, 50%), #000 40%, transparent 100%);
+          mask: radial-gradient(circle var(--fr, 0px) at var(--fmx, 50%) var(--fmy, 50%), #000 40%, transparent 100%);
+  filter: drop-shadow(0 0 2px rgba(255,236,200,.55)) drop-shadow(0 0 10px rgba(255,226,180,.18));
+  transition: filter 1.6s ease;
+}
+.figure .ln { fill: none; stroke: var(--line); stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; transition: stroke 1.6s ease; }
+.figure .pg { fill: var(--pagefill); transition: fill .6s ease; }
+.figure .ink { fill: var(--line); transition: fill 1.6s ease; }
+.figure .tints { mix-blend-mode: multiply; }
+.intro.fillpaper .figure { --pagefill: #fbfaf6; }
+.intro.paper .figure { --line: #2a2833; --pagefill: #fbfaf6; filter: blur(var(--blur, 0px)); }
+.intro.lit .figure { -webkit-mask: none; mask: none; }
+.haze {
+  position: absolute; inset: 0; pointer-events: none;
+  background: rgba(251,250,246,var(--ha, 0));
+  -webkit-backdrop-filter: blur(var(--hb, 0px)); backdrop-filter: blur(var(--hb, 0px));
+}
+
+.title {
+  position: absolute; left: 0; right: 0; bottom: 6vh; z-index: 3; text-align: center;
+  display: grid; gap: 8px; justify-items: center;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  opacity: 0; transform: translateY(14px) scale(.985); filter: blur(14px);
+  transition: opacity 2s ease, transform 2.2s cubic-bezier(.2,.7,.2,1), filter 2s ease;
+}
+.intro.titled .title { opacity: 1; transform: none; filter: blur(0); }
+.title .mark { position: relative; display: inline-block; }
+.drops { position: absolute; inset: -60% -18%; width: 136%; height: 220%; z-index: -1; overflow: visible; pointer-events: none; mix-blend-mode: multiply; }
+.drop { transform-box: fill-box; transform-origin: center; transform: scale(0); opacity: 0; }
+.intro.bright .drop { animation: plop 2.6s cubic-bezier(.2,.9,.3,1) forwards; }
+.intro.bright .drop.d1 { animation-delay: 1.5s; }
+.intro.bright .drop.d2 { animation-delay: 2s; }
+/* 톡 떨어진 뒤 종이에 천천히 번진다 */
+@keyframes plop { 0% { transform: scale(0); opacity: 0; } 12% { transform: scale(.7); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+.title .wordmark {
+  font-family: var(--font-latin); font-size: clamp(40px, 7.5vw, 84px);
+  line-height: 1; letter-spacing: .04em; color: var(--ink); margin: 0;
+}
+.title .tagline { font-family: var(--font-display); font-size: clamp(15px, 2vw, 20px); color: var(--ink); margin: 0; letter-spacing: .02em; }
+.hint {
+  position: absolute; z-index: 3; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+  font-size: 12px; letter-spacing: .2em; color: var(--mute); opacity: 0; transition: opacity .8s ease; white-space: nowrap;
+}
+.skip {
+  position: absolute; z-index: 4; top: calc(16px + env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px));
+  background: none; border: 1px solid rgba(241,237,228,.3); color: rgba(241,237,228,.7); cursor: pointer;
+  font-size: 12px; letter-spacing: .14em; padding: 6px 12px; border-radius: 999px;
+}
+.intro.titled .skip { display: none; }
+.intro.paper .skip { border-color: rgba(35,33,47,.3); color: var(--mute); }
+
+/* ───────── 공통 섹션 ───────── */
+.wrap {
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(150px, env(safe-area-inset-right, 0px));
+  padding-block: 96px;
+  max-width: 1280px; margin: 0 auto;
+}
+.wrap.first { padding-left: max(150px, env(safe-area-inset-left, 0px)); }
+@media (max-width: 720px) { .wrap.first { padding-left: max(14px, env(safe-area-inset-left, 0px)); } }
+.sec-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px 32px; margin-bottom: 40px; }
+.sec-head h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(24px, 3.4vw, 34px); margin: 0; text-wrap: balance; }
+.sec-head p { margin: 4px 0 0; color: var(--mute); font-size: 14px; }
+.eyebrow { font-family: var(--font-latin); font-size: 15px; letter-spacing: .18em; color: var(--cobalt); text-transform: uppercase; }
+
+.switch { display: inline-flex; border: 1px solid var(--ink); border-radius: 999px; padding: 3px; }
+.switch button {
+  background: none; border: 0; padding: 6px 16px; border-radius: 999px; cursor: pointer;
+  font-size: 13px; letter-spacing: .06em;
+}
+.switch button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+/* ───────── 회전 카드: 타원 궤도를 도는 유리 카드, 뒤로 돌아가며 흐려진다 ───────── */
+.ring-view {
+  position: relative; height: clamp(420px, 54vw, 580px); touch-action: pan-y; cursor: grab;
+  user-select: none; -webkit-user-select: none; overflow: hidden;
+  -webkit-mask: linear-gradient(90deg, transparent 0, #000 9%, #000 91%, transparent 100%);
+          mask: linear-gradient(90deg, transparent 0, #000 9%, #000 91%, transparent 100%);
+}
+.ring-view::before { /* 유리 너머로 비치는 작품 빛깔 */
+  content: ""; position: absolute; inset: 8% 6%; border-radius: 50%; pointer-events: none;
+  background:
+    radial-gradient(closest-side at 22% 55%, rgba(236,120,158,.55), transparent),
+    radial-gradient(closest-side at 50% 40%, rgba(44,62,160,.40), transparent),
+    radial-gradient(closest-side at 78% 58%, rgba(246,196,64,.50), transparent),
+    radial-gradient(closest-side at 50% 80%, rgba(64,190,200,.35), transparent);
+  filter: blur(50px); opacity: .8;
+}
+.ring-view.grabbing { cursor: grabbing; }
+.ring { position: absolute; left: 50%; top: 50%; width: 0; height: 0; }
+.card {
+  position: absolute; width: var(--cw); height: calc(var(--cw) * 1.32);
+  left: calc(var(--cw) / -2); top: calc(var(--cw) * -0.66);
+  padding: 10px 10px 36px; border-radius: 18px; cursor: pointer; display: block; overflow: hidden;
+  background: linear-gradient(150deg, rgba(255,255,255,.55), rgba(255,255,255,.18));
+  border: 1px solid rgba(255,255,255,.75);
+  -webkit-backdrop-filter: blur(14px) saturate(1.5); backdrop-filter: blur(14px) saturate(1.5);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(255,255,255,.25), 0 24px 48px -24px rgba(31,29,43,.45);
+  will-change: transform, filter, opacity;
+}
+.card::after { /* 유리 위로 미끄러지는 빛 */
+  content: ""; position: absolute; inset: -40%; pointer-events: none;
+  background: linear-gradient(115deg, transparent 38%, rgba(255,255,255,.55) 48%, transparent 58%);
+  transform: translateX(var(--sheen, 0%));
+}
+.card img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; border-radius: 10px; opacity: var(--io, 1); }
+.card span {
+  position: absolute; left: 14px; right: 14px; bottom: 10px;
+  font-family: var(--font-display); font-size: 12.5px; text-align: left;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink);
+}
+
+.album[hidden], .ring-wrap[hidden] { display: none; }
+
+/* ───────── 우표첩: 한 장에 몇 장씩, 한 장씩 넘겨 본다 ───────── */
+.album { display: grid; gap: 4px; }
+.alb-sheet { position: relative; background: #fff; border: 1px solid #e8e6ec; border-radius: 6px; padding: clamp(18px, 3vw, 36px) clamp(14px, 3vw, 36px) 50px; box-shadow: 0 22px 40px -28px rgba(31,29,43,.35), inset 0 0 0 6px #fbfaf6; }
+.alb-grid { display: grid; grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr)); gap: clamp(22px, 3vw, 40px) clamp(12px, 2.4vw, 30px); }
+.alb-stamp { border: 0; padding: 0; background: none; cursor: pointer; min-width: 0; text-align: center; transform: rotate(var(--rot, 0deg)) translateY(var(--dy, 0px)); transition: transform .35s ease; filter: drop-shadow(0 8px 12px rgba(31,29,43,.22)); }
+.alb-stamp:hover, .alb-stamp:focus-visible { transform: rotate(0deg) translateY(-6px) scale(1.04); z-index: 2; }
+.alb-stamp .stamp-paper { padding: 10px 10px 28px; }
+.alb-stamp .stamp-paper img { aspect-ratio: 4 / 5; object-fit: contain; background: #f3f2ee; }
+.alb-no { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); font-family: var(--font-latin); font-size: 13px; letter-spacing: .24em; color: var(--mute); }
+.alb-empty { grid-column: 1 / -1; padding: 40px 12px; text-align: center; color: var(--mute); }
+
+/* 카드 넘기기·우표첩 공통 컨트롤 */
+.cf-cap { margin: 4px 0 0; text-align: center; min-height: 3.2em; }
+.cf-cap em { display: block; font-style: normal; font-family: var(--font-latin); font-size: 13px; letter-spacing: .2em; color: var(--cobalt); }
+.cf-cap b { font-family: var(--font-display); font-weight: 400; font-size: clamp(17px, 2.2vw, 22px); }
+.cf-cap span { display: block; font-size: 13px; color: var(--mute); }
+.pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 14px; margin-top: 14px; }
+.pager button { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--ink); background: none; cursor: pointer; font-size: 18px; flex: none; }
+.pager button:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
+.pager button:disabled { opacity: .3; cursor: default; }
+.pager input[type=range] { width: min(380px, 44vw); accent-color: var(--ink); }
+.pager output { font-size: 13px; color: var(--mute); min-width: 8ch; text-align: center; font-variant-numeric: tabular-nums; }
+.pg-find { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--mute); }
+.pg-find input { font: inherit; font-size: 14px; color: var(--ink); background: #fff; border: 1px solid #dddbe3; border-radius: 8px; padding: 6px 10px; width: min(150px, 34vw); min-width: 0; }
+.ring-view:focus-visible { outline-offset: -4px; }
+@media (max-width: 720px) { .pager input[type=range] { width: 38vw; } .pg-find { flex: 1 1 100%; justify-content: center; } }
+
+.stamp-paper {
+  display: block; background: #fff; padding: 12px 12px 30px; position: relative;
+  -webkit-mask: radial-gradient(circle at center, transparent 4px, #000 4.6px) -6px -6px / 12px 12px round,
+                linear-gradient(#000 0 0) 6px 6px / calc(100% - 12px) calc(100% - 12px) no-repeat;
+          mask: radial-gradient(circle at center, transparent 4px, #000 4.6px) -6px -6px / 12px 12px round,
+                linear-gradient(#000 0 0) 6px 6px / calc(100% - 12px) calc(100% - 12px) no-repeat;
+}
+.stamp-paper img { display: block; width: 100%; }
+.stamp-paper b {
+  position: absolute; left: 14px; right: 14px; bottom: 8px; display: flex; justify-content: space-between; gap: 8px;
+  font-weight: 400; font-size: 10px; letter-spacing: .1em; color: var(--ink); white-space: nowrap;
+}
+.stamp-paper b em { font-style: normal; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-display); letter-spacing: 0; }
+.stamp-paper b small { font-family: var(--font-latin); font-size: 11px; color: var(--cobalt); }
+.postmark {
+  position: absolute; right: -10px; top: -14px; width: 74px; height: 74px; border-radius: 50%;
+  border: 1.5px solid rgba(44,62,160,.55); display: grid; place-items: center; transform: rotate(-18deg);
+  font-family: var(--font-latin); font-size: 10px; letter-spacing: .14em; color: rgba(44,62,160,.7); pointer-events: none;
+  text-align: center; line-height: 1.2;
+}
+
+/* ───────── 전시실 ───────── */
+.works { display: grid; gap: clamp(64px, 10vw, 130px); }
+.xf { display: grid; gap: 12px; margin: -12px 0 clamp(36px, 6vw, 64px); }
+.xf-top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+.xf-all { font-family: var(--font-latin); font-size: 15px; letter-spacing: .14em; padding: 4px 18px; border-radius: 999px; border: 1px solid var(--ink); background: none; cursor: pointer; }
+.xf-all[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.xf-find { flex: 1 1 220px; max-width: 340px; }
+.xf-find input { width: 100%; font: inherit; font-size: 14px; color: var(--ink); background: #fff; border: 1px solid #dddbe3; border-radius: 999px; padding: 7px 16px; }
+.work .no { font-family: var(--font-latin); font-size: 13px; letter-spacing: .14em; color: var(--cobalt); }
+.xf-sort { display: flex; align-items: center; gap: 8px; font-size: 12px; letter-spacing: .08em; color: var(--mute); margin-left: auto; }
+.xf-sort select { font: inherit; font-size: 14px; color: var(--ink); background: #fff; border: 1px solid #dddbe3; border-radius: 8px; padding: 6px 10px; }
+.xf-count { margin: 0; flex: 1 1 100%; font-size: 13px; color: var(--mute); }
+.xf-count b { font-family: var(--font-display); font-size: 20px; color: var(--ink); margin-right: 2px; }
+.xf-row { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.xf-row > b { flex: none; width: 3.6em; font-weight: 400; font-size: 12px; letter-spacing: .16em; color: var(--mute); }
+.xf-chips { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+.xf-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 12px; font-size: 13px; border: 1px solid #cfcdd6; border-radius: 999px; background: none; cursor: pointer; white-space: nowrap; }
+.xf-chip small { color: var(--mute); font-size: 11px; font-variant-numeric: tabular-nums; }
+.xf-chip i { width: 11px; height: 11px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(31,29,43,.18); }
+.xf-chip:hover { border-color: var(--ink); }
+.xf-chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.xf-chip[aria-pressed="true"] small { color: rgba(248,248,245,.75); }
+.xf-note { font-size: 12px; color: var(--mute); }
+.xf-active { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 12px; border: 1px dashed #cfcdd6; border-radius: 12px; }
+.xf-active[hidden] { display: none; }
+.xf-active > b { flex: none; font-weight: 400; font-size: 12px; letter-spacing: .14em; color: var(--mute); margin-right: 2px; }
+.xf-tag { display: inline-flex; align-items: center; gap: 7px; padding: 3px 6px 3px 12px; font-size: 13px; border: 1px solid var(--ink); border-radius: 999px; background: var(--ink); color: var(--paper); cursor: pointer; }
+.xf-tag em { font-style: normal; font-size: 11px; opacity: .7; letter-spacing: .06em; }
+.xf-tag i { width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 0 1px rgba(248,248,245,.6); }
+.xf-tag span { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: rgba(248,248,245,.18); font-size: 13px; line-height: 1; }
+.xf-tag:hover span { background: rgba(248,248,245,.4); }
+.xf-clear { background: none; border: 0; border-bottom: 1px solid var(--mute); padding: 0; margin-left: 4px; font-size: 12px; color: var(--mute); cursor: pointer; }
+.xf-view { display: inline-flex; border: 1px solid var(--ink); border-radius: 999px; overflow: hidden; }
+.xf-view button { font: inherit; font-size: 13px; letter-spacing: .08em; padding: 5px 16px; background: none; border: 0; color: var(--ink); cursor: pointer; }
+.xf-view button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.works.grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 34px 20px; align-items: start; }
+.gitem { margin: 0; min-width: 0; }
+.gitem figure { margin: 0; cursor: zoom-in; aspect-ratio: 1; display: grid; place-items: center; background: #efeee9; overflow: hidden; }
+.gitem img { max-width: 100%; max-height: 100%; width: 100%; height: 100%; object-fit: contain; transition: transform .5s ease; }
+.gitem figure:hover img { transform: scale(1.04); }
+.gitem p { margin: 10px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink); overflow-wrap: anywhere; }
+.gitem .no { display: block; font-family: var(--font-latin); font-size: 12px; letter-spacing: .14em; color: var(--cobalt); }
+.xf-sentinel { height: 1px; }
+@media (max-width: 720px) { .works.grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 12px; } }
+.xf-more { display: block; margin: clamp(48px, 7vw, 80px) auto 0; background: none; border: 1px solid var(--ink); border-radius: 999px; padding: 10px 30px; cursor: pointer; font-size: 14px; }
+.xf-more:hover { background: var(--ink); color: var(--paper); }
+.xf-more[hidden] { display: none; }
+.xf-empty { padding: 48px 16px; text-align: center; color: var(--mute); border: 1px dashed #d9d7df; border-radius: 12px; }
+.work { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 1fr); gap: 32px; align-items: end; }
+.work:nth-child(even) { grid-template-columns: minmax(0, 1fr) minmax(0, 3fr); }
+.work:nth-child(even) figure { order: 2; }
+.work figure { margin: 0; cursor: zoom-in; }
+.work img {
+  display: block; max-width: 100%; max-height: 82vh; width: auto; margin-inline: auto;
+  box-shadow: 0 30px 60px -30px rgba(31,29,43,.4);
+  transform: translateY(26px) scale(.98); opacity: .4;
+  transition: transform 1.1s cubic-bezier(.2,.7,.2,1), opacity 1.1s ease;
+}
+.work.seen img { transform: none; opacity: 1; }
+.cap { display: grid; gap: 10px; min-width: 0; }
+.cap h3 { font-family: var(--font-display); font-weight: 400; font-size: clamp(20px, 2.4vw, 28px); line-height: 1.35; margin: 0; text-wrap: balance; }
+.cap dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 14px; font-size: 13px; color: var(--mute); }
+.cap dt { letter-spacing: .1em; }
+.cap dd { margin: 0; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+footer { text-align: center; color: var(--mute); font-size: 13px; }
+footer .wordmark { font-family: var(--font-latin); font-size: 34px; color: var(--ink); display: block; letter-spacing: .04em; }
+footer .admin-link { display: inline-block; margin-top: 18px; font-size: 12px; letter-spacing: .14em; color: var(--mute); }
+.lb-text p { white-space: pre-line; }
+.work .desc { grid-row: 2; grid-column: 1; margin: 0; max-width: 60ch; justify-self: center; font-size: 14px; line-height: 1.8; color: var(--ink); white-space: pre-line; overflow-wrap: anywhere; }
+.work:nth-child(even) .desc { grid-column: 2; }
+@media (max-width: 640px) {
+  .work, .work:nth-child(even) { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .work:nth-child(even) figure { order: 0; }
+  .work .desc, .work:nth-child(even) .desc { grid-column: 1; grid-row: auto; }
+}
+
+/* ───────── 관리자 페이지 (#admin) ───────── */
+body.admin > :not(#admin):not(script):not(style) { display: none !important; }
+body.admin { overflow: auto !important; }
+#admin {
+  min-height: 100vh; background: var(--paper);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 80px;
+}
+.adm { max-width: 960px; margin: 0 auto; display: grid; gap: 24px; }
+.adm-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; padding-bottom: 20px; border-bottom: 1px solid #e3e1e8; }
+.adm-head h1 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(24px, 3.4vw, 32px); }
+.adm-head p { margin: 4px 0 0; color: var(--mute); font-size: 14px; }
+.adm-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn {
+  font: inherit; font-size: 14px; padding: 8px 16px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--ink); background: none; color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+}
+.btn.primary { background: var(--ink); color: var(--paper); }
+.btn.quiet { border-color: #d9d7df; color: var(--mute); }
+.btn.danger { border-color: #c2414b; color: #c2414b; }
+.btn:disabled { opacity: .4; cursor: default; }
+.adm-bar { display: grid; gap: 12px; }
+.adm-count { margin: 0; font-size: 15px; }
+.adm-count b { font-family: var(--font-display); font-size: 24px; font-weight: 700; margin-right: 2px; font-variant-numeric: tabular-nums; }
+.adm-count span { color: var(--mute); font-size: 13px; margin-left: 8px; }
+.adm-tools { display: flex; flex-wrap: wrap; gap: 10px 12px; align-items: end; }
+.adm-tools label { display: grid; gap: 4px; font-size: 12px; letter-spacing: .06em; color: var(--mute); }
+.adm-tools input, .adm-tools select {
+  font: inherit; font-size: 14px; color: var(--ink); background: #fff;
+  border: 1px solid #dddbe3; border-radius: 8px; padding: 7px 10px; min-width: 0;
+}
+.adm-tools input { width: min(220px, 70vw); }
+.adm-hint { margin: 0; font-size: 12px; color: var(--mute); }
+.adm-sync { padding: 14px 16px; border-radius: 12px; font-size: 14px; line-height: 1.7; border: 1px solid #e8e6ec; background: #fff; }
+.adm-sync.warn { border-color: #e0b34a; background: #fffaf0; }
+.adm-sync b { font-weight: 700; }
+.adm-note { padding: 20px; border: 1px dashed #d9d7df; border-radius: 12px; color: var(--mute); text-align: center; }
+.adm-list { display: grid; gap: 16px; }
+.adm-item {
+  display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 20px; padding: 16px;
+  background: #fff; border: 1px solid #e8e6ec; border-radius: 14px;
+}
+.adm-thumb { display: grid; gap: 8px; align-content: start; }
+.adm-thumb .ph {
+  aspect-ratio: 1; border-radius: 8px; background: #f1f0f4 center / contain no-repeat;
+  display: grid; place-items: center; color: var(--mute); font-size: 12px; text-align: center;
+}
+.adm-thumb label { justify-content: center; }
+.adm-thumb input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.adm-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 12px; min-width: 0; }
+.adm-fields .full { grid-column: 1 / -1; }
+.adm-fields label { display: grid; gap: 4px; font-size: 12px; letter-spacing: .06em; color: var(--mute); min-width: 0; }
+.adm-fields input, .adm-fields textarea {
+  font: inherit; font-size: 15px; color: var(--ink); background: var(--paper);
+  border: 1px solid #dddbe3; border-radius: 8px; padding: 8px 10px; width: 100%; min-width: 0;
+}
+.adm-fields label.chk { display: flex; align-items: center; gap: 8px; font-size: 13px; letter-spacing: 0; color: var(--ink); }
+.adm-fields label.chk input { width: auto; accent-color: var(--cobalt); }
+.adm-fields textarea { min-height: 64px; max-height: 420px; resize: vertical; line-height: 1.6; overflow-y: auto; }
+.adm-row { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.adm-row .left { display: flex; gap: 6px; align-items: center; }
+.adm-num { font-family: var(--font-latin); font-size: 18px; color: var(--cobalt); min-width: 2ch; }
+.adm-status { font-size: 12px; color: var(--mute); }
+.adm-status.err { color: #c2414b; }
+.adm-confirm { display: flex; gap: 6px; align-items: center; font-size: 13px; color: #c2414b; }
+@media (max-width: 640px) {
+  .adm-item { grid-template-columns: minmax(0, 1fr); }
+  .adm-thumb { grid-template-columns: 96px minmax(0, 1fr); align-items: center; }
+  .adm-fields { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ───────── 확대 보기 ───────── */
+.lightbox {
+  position: fixed; inset: 0; z-index: 50; display: grid; place-items: center;
+  background: rgba(248,248,245,0); transition: background .5s ease; pointer-events: none;
+  padding: calc(24px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+}
+.lightbox.on { background: rgba(248,248,245,.97); pointer-events: auto; cursor: zoom-out; }
+.lb-img { position: fixed; left: 0; top: 0; transform-origin: 0 0; box-shadow: 0 30px 70px -30px rgba(31,29,43,.5); transition: transform .65s cubic-bezier(.6,0,.15,1); will-change: transform; }
+.lb-text {
+  position: fixed; left: 50%; bottom: calc(28px + env(safe-area-inset-bottom, 0px)); width: min(560px, calc(100% - 32px));
+  transform: translate(-50%, 24px); opacity: 0; text-align: center;
+  transition: transform .6s ease, opacity .6s ease;
+}
+.lightbox.on .lb-text.show { transform: translate(-50%, 0); opacity: 1; transition-delay: .35s; }
+.lb-text h3 { font-family: var(--font-display); font-weight: 400; font-size: clamp(20px, 3vw, 28px); margin: 0 0 4px; }
+.lb-text p { margin: 0; color: var(--mute); font-size: 14px; letter-spacing: .04em; line-height: 1.7; }
+.lb-text { max-height: 38vh; overflow-y: auto; overscroll-behavior: contain; }
+.lb-close {
+  position: fixed; top: calc(16px + env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px));
+  background: none; border: 1px solid var(--ink); border-radius: 999px; padding: 6px 14px; font-size: 13px; cursor: pointer;
+  opacity: 0; transition: opacity .4s ease;
+}
+.lightbox.on .lb-close { opacity: 1; }
+
+/* ───────── 계단 ───────── */
+.stairs {
+  position: fixed; z-index: 20; right: max(16px, env(safe-area-inset-right, 0px)); top: 14vh;
+  width: 120px; height: 72vh; opacity: 0; transition: opacity .8s ease; pointer-events: none;
+}
+.stairs.show { opacity: 1; pointer-events: auto; }
+.stairs svg.steps { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.stairs svg.steps path { fill: none; stroke: var(--ink); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.stairs svg.steps .rail { stroke: var(--mute); stroke-width: .8; stroke-dasharray: 2 4; }
+.stairs .hit { position: absolute; height: 22px; cursor: pointer; background: none; border: 0; padding: 0; }
+.walker {
+  position: absolute; left: 0; top: 0; width: 26px; height: 40px; pointer-events: none;
+  transition: transform .26s cubic-bezier(.4,0,.3,1);
+}
+.walker .body { position: absolute; inset: 0; transform-origin: 50% 100%; }
+.walker svg { width: 100%; height: 100%; overflow: visible; color: var(--ink); }
+.walker svg path, .walker svg line { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.walker svg .hair { fill: var(--cobalt); stroke: var(--cobalt); }
+.walker svg .shirt { fill: #f3b8cb; }
+.walker .leg-a, .walker .leg-b { transform-box: fill-box; transform-origin: 50% 0; }
+.walker.walking .body { animation: bob .26s ease-in-out infinite; }
+.walker.walking .leg-a { animation: stride .26s ease-in-out infinite alternate; }
+.walker.walking .leg-b { animation: stride .26s ease-in-out infinite alternate-reverse; }
+@keyframes bob { 50% { transform: translateY(-4px); } }
+@keyframes stride { from { transform: rotate(-24deg); } to { transform: rotate(24deg); } }
+
+/* 모바일 하단 바 */
+.dock { display: none; }
+@media (max-width: 720px) {
+  .stairs { display: none !important; }
+  .dock {
+    display: block; position: fixed; z-index: 20; left: 0; right: 0; bottom: 0; opacity: 0; transform: translateY(100%); transition: opacity .6s ease, transform .6s ease;
+    background: rgba(248,248,245,.94); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-top: 1px solid #e3e1e8;
+    padding: 4px max(14px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left, 0px));
+  }
+  .dock.show { opacity: 1; transform: none; }
+  body.locked .dock { opacity: 0; pointer-events: none; }
+  .dock-bar { position: absolute; left: 0; top: -1px; height: 2px; width: 100%; background: var(--cobalt); transform-origin: 0 50%; transform: scaleX(0); pointer-events: none; }
+  .dock-nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 4px; }
+  .dock-nav button { font: inherit; font-size: 13px; letter-spacing: .06em; color: var(--ink); background: none; border: 0; border-radius: 10px; padding: 9px 4px; min-height: 40px; }
+  .dock-nav button:active { background: rgba(31,29,43,.08); }
+  .dock-nav button[aria-current="true"] { font-weight: 700; color: var(--cobalt); }
+  body { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
+  .wrap, .wrap.first { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 64px; }
+  .work, .work:nth-child(even) { grid-template-columns: minmax(0, 1fr); }
+  .work:nth-child(even) figure { order: 0; }
+  .switch { width: 100%; }
+  .xf-row { flex-direction: column; align-items: stretch; gap: 6px; }
+  .xf-row > b { width: auto; }
+  .xf-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; margin-right: -4px; }
+  .xf-chips::-webkit-scrollbar { display: none; }
+  .xf-sort { margin-left: 0; }
+  .switch button { flex: 1; padding: 6px 4px; font-size: 12.5px; letter-spacing: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wrap *, .stairs *, .lightbox * { transition-duration: .01ms !important; animation: none !important; }
+  html { scroll-behavior: auto; }
+}
+</style>
+
+<!-- ───────── 인트로 ───────── -->
+<section class="intro" id="intro" aria-label="gallery parranii">
+  <svg class="paper-bg" id="paper-bg" aria-hidden="true">
+    <defs>
+      <filter id="grain-f">
+        <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="2"/>
+        <feColorMatrix values="0 0 0 0 .55  0 0 0 0 .5  0 0 0 0 .45  0 0 0 .09 0"/>
+      </filter>
+    </defs>
+    <rect width="100%" height="100%" filter="url(#grain-f)"/>
+  </svg>
+  <svg class="figure" id="figure" viewBox="0 0 1254 1254" aria-hidden="true">
+    <defs>
+    </defs>
+    <g id="body-lines"></g>
+    <g id="arms"></g>
+    <g id="book-fills"></g>
+    <g id="hands"></g>
+    <g id="threads"></g>
+  </svg>
+  <div class="haze" id="haze" aria-hidden="true"></div>
+  <div class="title">
+    <div class="mark">
+      <svg class="drops" viewBox="0 0 400 200" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <filter id="blot" x="-40%" y="-40%" width="180%" height="180%">
+            <feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="3" seed="11" result="n"/>
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G" result="d"/>
+            <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="4" result="g"/>
+            <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.4 1.25" result="gm"/>
+            <feComposite in="d" in2="gm" operator="in"/>
+            <feGaussianBlur stdDeviation=".5"/>
+          </filter>
+          <radialGradient id="pink-pool"><stop offset="0" stop-color="#e9789c" stop-opacity=".14"/><stop offset=".7" stop-color="#e9789c" stop-opacity=".3"/><stop offset=".94" stop-color="#d9507e" stop-opacity=".62"/><stop offset="1" stop-color="#d9507e" stop-opacity=".25"/></radialGradient>
+          <radialGradient id="blue-pool"><stop offset="0" stop-color="#5a6fd8" stop-opacity=".12"/><stop offset=".7" stop-color="#4a5fd0" stop-opacity=".26"/><stop offset=".94" stop-color="#2c3ea0" stop-opacity=".55"/><stop offset="1" stop-color="#2c3ea0" stop-opacity=".2"/></radialGradient>
+        </defs>
+        <g class="drop d1" filter="url(#blot)">
+          <ellipse cx="92" cy="74" rx="46" ry="40" fill="url(#pink-pool)"/>
+          <ellipse cx="74" cy="64" rx="20" ry="16" fill="#e9789c" fill-opacity=".16"/>
+          <circle cx="146" cy="52" r="4" fill="#e9789c" fill-opacity=".5"/>
+          <circle cx="40" cy="112" r="2.6" fill="#e9789c" fill-opacity=".5"/>
+        </g>
+        <g class="drop d2" filter="url(#blot)">
+          <ellipse cx="312" cy="128" rx="40" ry="35" fill="url(#blue-pool)"/>
+          <ellipse cx="326" cy="138" rx="15" ry="12" fill="#4a5fd0" fill-opacity=".14"/>
+          <circle cx="262" cy="160" r="3.4" fill="#4a5fd0" fill-opacity=".5"/>
+          <circle cx="358" cy="92" r="2.2" fill="#4a5fd0" fill-opacity=".5"/>
+        </g>
+      </svg>
+      <h1 class="wordmark">gallery parranii</h1>
+    </div>
+    <p class="tagline">시선이 작품이 되는 곳, 파르라니</p>
+  </div>
+  <button class="skip" id="skip" type="button">건너뛰기</button>
+  <div class="hint" id="hint">아래로 내려 작품 보기 ↓</div>
+</section>
+
+<!-- ───────── 둘러보기 ───────── -->
+<section class="wrap first" id="browse">
+  <div class="sec-head">
+    <div>
+      <div class="eyebrow">Collection</div>
+      <h2>작품 둘러보기</h2>
+      <p id="browse-help">카드를 끌어 돌리고, 눌러서 크게 보세요.</p>
+    </div>
+    <div class="switch" role="group" aria-label="보기 방식">
+      <button type="button" id="mode-ring" aria-pressed="true">카드 넘기기</button>
+      <button type="button" id="mode-stamp" aria-pressed="false">우표첩</button>
+    </div>
+  </div>
+  <div class="ring-wrap" id="ring-wrap">
+    <div class="ring-view" id="ring-view" tabindex="0" aria-label="카드 넘기기. 좌우 화살표로 넘기고, 가운데 카드를 누르면 크게 봐요"><div class="ring" id="ring"></div></div>
+    <p class="cf-cap" id="cf-cap" aria-live="polite"></p>
+    <div class="pager">
+      <button type="button" id="cf-prev" aria-label="이전 작품">←</button>
+      <input type="range" id="cf-range" min="0" max="0" value="0" aria-label="작품 위치">
+      <output id="cf-count"></output>
+      <button type="button" id="cf-next" aria-label="다음 작품">→</button>
+      <label class="pg-find"><span>찾아가기</span><input type="search" id="cf-q" placeholder="제목 · 번호"></label>
+    </div>
+  </div>
+  <div class="album" id="album" hidden>
+    <div class="alb-sheet"><div class="alb-grid" id="alb-grid"></div><span class="alb-no" id="alb-no"></span></div>
+    <div class="pager">
+      <button type="button" id="alb-prev" aria-label="이전 장">←</button>
+      <input type="range" id="alb-range" min="0" max="0" value="0" aria-label="우표첩 장 이동">
+      <output id="alb-count"></output>
+      <button type="button" id="alb-next" aria-label="다음 장">→</button>
+      <label class="pg-find"><span>찾아가기</span><input type="search" id="alb-q" placeholder="제목 · 번호"></label>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── 전시실 ───────── -->
+<section class="wrap first" id="room" aria-labelledby="room-title">
+  <div class="sec-head">
+    <div>
+      <div class="eyebrow">Exhibition</div>
+      <h2 id="room-title">한 점씩 천천히</h2>
+    </div>
+  </div>
+  <div class="xf" id="xf">
+    <div class="xf-top">
+      <button class="xf-all" type="button" id="xf-all" aria-pressed="true">ALL</button>
+      <div class="xf-view" role="group" aria-label="보기 방식"><button type="button" data-view="grid" aria-pressed="true">격자</button><button type="button" data-view="big" aria-pressed="false">크게</button></div>
+      <label class="xf-sort">정렬
+        <select id="xf-sort">
+          <option value="order">전시 순서</option>
+          <option value="year-desc">연도 최신순</option>
+          <option value="year-asc">연도 오래된순</option>
+          <option value="medium">재료순</option>
+          <option value="title">제목 가나다순</option>
+        </select>
+      </label>
+      <label class="xf-find"><input type="search" id="xf-q" placeholder="제목 · 작품 번호로 찾기" autocomplete="off" aria-label="제목 또는 작품 번호로 찾기"></label>
+      <p class="xf-count" id="xf-count" aria-live="polite"></p>
+    </div>
+    <div class="xf-active" id="xf-active" hidden></div>
+    <div class="xf-row"><b>연도</b><div class="xf-chips" id="xf-year"></div></div>
+    <div class="xf-row"><b>재료</b><div class="xf-chips" id="xf-medium"></div></div>
+  </div>
+  <div class="works" id="works"></div>
+  <div class="xf-sentinel" id="xf-sentinel"></div>
+  <button class="xf-more" type="button" id="xf-more" hidden></button>
+</section>
+
+<footer class="wrap first">
+  <span class="wordmark">gallery parranii</span>
+  시선이 작품이 되는 곳, 파르라니
+  <br><a class="admin-link" id="admin-link" href="#admin" hidden>작품 관리</a>
+</footer>
+
+<!-- ───────── 관리자 페이지 ───────── -->
+<section id="admin" hidden aria-labelledby="adm-title">
+  <div class="adm">
+    <div class="adm-head">
+      <div>
+        <h1 id="adm-title">작품 관리</h1>
+        <p>사진과 캡션을 고치면 바로 저장되고, 갤러리에 곧바로 반영돼요.</p>
+      </div>
+      <div class="adm-actions">
+        <a class="btn quiet" href="#">갤러리로 돌아가기</a>
+        <button class="btn primary" type="button" id="adm-add" hidden>새 작품 추가</button>
+      </div>
+    </div>
+    <div class="adm-bar" id="adm-bar" hidden>
+      <p class="adm-count" id="adm-count" aria-live="polite"></p>
+      <div class="adm-tools">
+        <label>찾기<input type="search" id="adm-q" placeholder="제목, 재료, 설명"></label>
+        <label>재료<select id="adm-medium"><option value="">전체</option></select></label>
+        <label>연도<select id="adm-year"><option value="">전체</option></select></label>
+        <label>사진<select id="adm-photo"><option value="">전체</option><option value="yes">있음</option><option value="no">없음</option></select></label>
+        <label>정렬<select id="adm-sort">
+          <option value="order">전시 순서</option>
+          <option value="title">제목 가나다순</option>
+          <option value="year-desc">연도 최신순</option>
+          <option value="year-asc">연도 오래된순</option>
+          <option value="size-desc">크기 큰 순</option>
+          <option value="size-asc">크기 작은 순</option>
+          <option value="recent">최근 추가순</option>
+        </select></label>
+        <button class="btn quiet" type="button" id="adm-reset">초기화</button>
+      </div>
+      <p class="adm-hint" id="adm-hint" hidden>순서 바꾸기(↑↓)는 ‘전시 순서’로 정렬하고 필터를 모두 풀었을 때 쓸 수 있어요.</p>
+    </div>
+    <div class="adm-sync" id="adm-sync" hidden></div>
+    <div class="adm-note" id="adm-note">불러오는 중…</div>
+    <div class="adm-list" id="adm-list"></div>
+  </div>
+</section>
+
+<!-- ───────── 확대 보기 ───────── -->
+<div class="lightbox" id="lightbox" aria-hidden="true">
+  <img class="lb-img" id="lb-img" alt="" hidden>
+  <div class="lb-text" id="lb-text"><h3 id="lb-title"></h3><p id="lb-meta"></p></div>
+  <button class="lb-close" id="lb-close" type="button">닫기</button>
+</div>
+
+<!-- ───────── 모바일 하단 바 ───────── -->
+<nav class="dock" id="dock" aria-label="페이지 이동">
+  <i class="dock-bar" id="dock-bar" aria-hidden="true"></i>
+  <div class="dock-nav">
+    <button type="button" data-to="top">맨 위</button>
+    <button type="button" data-to="browse">작품 둘러보기</button>
+    <button type="button" data-to="room">전시</button>
+  </div>
+</nav>
+
+<!-- ───────── 계단 ───────── -->
+<nav class="stairs" id="stairs" aria-label="페이지 위치">
+  <svg class="steps" id="steps"></svg>
+  <div class="walker" id="walker">
+    <div class="body">
+      <svg viewBox="0 0 26 40" aria-hidden="true">
+        <path class="hair" d="M6 13 C5 5 9 2 13 2 C17 2 21 5 20 13 Z"/>
+        <path d="M8 9 C8 15 10 17 13 17 C16 17 18 15 18 9"/>
+        <path class="shirt" d="M8 18 L18 18 L19 29 L7 29 Z"/>
+        <line x1="8" y1="20" x2="5" y2="27"/><line x1="18" y1="20" x2="21" y2="27"/>
+        <line class="leg-a" x1="10.5" y1="29" x2="10.5" y2="38"/>
+        <line class="leg-b" x1="15.5" y1="29" x2="15.5" y2="38"/>
+      </svg>
+    </div>
+  </div>
+</nav>
+
+<script>
+/* 공개용 작품 목록: 로그인하지 않은 방문자(인스타그램 링크 등)는 공유 데이터베이스를 읽을 수 없어서 이 목록을 보여 준다.
+   관리자 페이지에서 고친 내용은 ‘공개 반영’을 해야 여기에 들어온다. */
+const SNAPSHOT = [
+  {"id": "surfboard", "title": "서핑보드", "size": "21×22cm", "medium": "종이에 과슈", "year": "2025", "image": "7203564040244875c31ebed62e48613c", "webFile": "web/surfboard.jpg", "order": 1},
+  {"id": "monterosso", "title": "몬테로소의 분홍벽", "size": "53×45.5cm", "medium": "한지에 한국화물감, 자개", "year": "2024", "image": "f610605ac712813ed882b9124c385878", "webFile": "web/monterosso.jpg", "order": 2},
+  {"id": "adult-sad", "title": "어른이 슬플 때도 있는 거지", "size": "25×18cm", "medium": "종이에 오일파스텔", "year": "2022", "image": "70eeb00c82bc61127fae50cca7b3e75d", "webFile": "web/adult-sad.jpg", "order": 3},
+  {"id": "hunger", "title": "정서적 허기", "size": "44×32cm", "medium": "종이에 한국화물감", "year": "2022", "image": "28408149e9745fb1461776abacb741b3", "webFile": "web/hunger.jpg", "order": 4},
+  {"id": "rest", "title": "주문하신 휴식 나왔습니다", "size": "23×17cm", "medium": "종이에 한국화물감, 오일파스텔", "year": "2021", "image": "90bee53906b9e58d359176db2f2b9559", "webFile": "web/rest.jpg", "order": 5},
+  {"id": "gjaa4qlkjfjy48ff1smn", "title": "시선이 작품이 되는 곳, 파르라니", "size": "72.7*60.6cm", "medium": "종이에 과슈", "year": "2026", "image": "2b41e808fba2b0ddb19ef3140b329fdc", "webFile": "web/gjaa4qlkjfjy48ff1smn.jpg", "order": 6},
+  {"id": "807rcpsescyn0g33juj7", "title": "이런 하루", "size": "23*17cm", "medium": "종이에 오일파스텔", "year": "2021", "image": "fc6daf91b95c418e03afc0a99f73509c", "webFile": "web/807rcpsescyn0g33juj7.jpg", "order": 7},
+  {"id": "bmn4es2w8afj5ix4g7zt", "title": "존재가 선명해지는 순간", "size": "21*15cm", "medium": "종이에 과슈", "year": "2025", "image": "56d7409e30c1cffdc4dbf67e4c75a963", "webFile": "web/bmn4es2w8afj5ix4g7zt.jpg", "order": 8},
+  {"id": "777q7lhrs9p52rzrzpxh", "title": "존재가 선명해지는 순간2", "size": "21*15cm", "medium": "종이에 과슈", "year": "2025", "image": "77cc300f72ef8e5c6147abcdd851e1a7", "webFile": "web/777q7lhrs9p52rzrzpxh.jpg", "order": 10},
+  {"id": "daqjacyhulgsx9av1eka", "title": "프리다이빙을 꿈꾸며", "size": "30*21cm", "medium": "종이에 과슈", "year": "2025", "image": "8a366c85774c5366d088afffd9d1abbf", "webFile": "web/daqjacyhulgsx9av1eka.jpg", "order": 11},
+  {"id": "sbayjc17erbd89dj4yvx", "title": "윤슬을 기다리며", "size": "33*43cm", "medium": "피그먼트프린트 / 사진", "year": "2023", "image": "f07c5414f50319f92a6ea6ebc67ae70d", "webFile": "web/sbayjc17erbd89dj4yvx.jpg", "order": 12},
+  {"id": "b3vtc6udveijsrwebtax", "title": "붉은뺨4", "size": "11.5*11.5cm", "medium": "나무에 오일파스텔, 아크릴릭", "year": "2026", "image": "06ee9b5c238178d5c584f05c4040485a", "webFile": "web/b3vtc6udveijsrwebtax.jpg", "order": 13},
+  {"id": "xycran063xncy0nfd9t6", "title": "붉은뺨3", "size": "11.5*11.5cm", "medium": "나무에 오일파스텔, 아크릴릭", "year": "2026", "image": "581213e32a1817936d2ac8a4d198f83d", "webFile": "web/xycran063xncy0nfd9t6.jpg", "order": 14},
+  {"id": "6qfujmn4bp13ny44e6xk", "title": "붉은뺨2", "size": "11.5*11.5cm", "medium": "나무에 오일파스텔, 아크릴릭", "year": "2026", "image": "2c883991d7535d94e0bc6731119f7c7b", "webFile": "web/6qfujmn4bp13ny44e6xk.jpg", "order": 15},
+  {"id": "50dn45s2a4myy9c8w8ux", "title": "붉은뺨", "size": "11.5*11.5cm", "medium": "나무에 오일파스텔, 아크릴릭", "year": "2026", "image": "822c834247d2d7e4ea832b9f653ae958", "webFile": "web/50dn45s2a4myy9c8w8ux.jpg", "order": 16},
+  {"id": "c05f70j516mg150eis9t", "title": "혼잣말", "size": "30*53cm", "medium": "나무에 과슈, 자개", "year": "2025", "image": "ac394da397c52d79ab259101df96c462", "webFile": "web/c05f70j516mg150eis9t.jpg", "order": 17},
+  {"id": "ciowckoh93gwnnzok8bt", "title": "때론 왕관을 쓰지 못할 만큼 작아지기도 ", "size": "10*10*5cm", "medium": "캔버스에 색연필, 자개", "year": "2026", "image": "9361aac76319acea52f93f475ad7933e", "webFile": "web/ciowckoh93gwnnzok8bt.jpg", "order": 18},
+  {"id": "89dj7o5cp2dl2kyj95sr", "title": "자신만의 왕관", "size": "10*10*5cm", "medium": "캔버스에 색연필, 자개", "year": "2026", "image": "0d706adee69c861f3ca58d02f7416d88", "webFile": "web/89dj7o5cp2dl2kyj95sr.jpg", "order": 19},
+  {"id": "7ujeozyrfhfbsfsc9i91", "title": "하트나무", "size": "10*10*5cm", "medium": "캔버스에 색연필, 자개", "year": "2026", "image": "6873e97bafd8fe44dcbfdf1404718e13", "webFile": "web/7ujeozyrfhfbsfsc9i91.jpg", "order": 20},
+  {"id": "qhckbzqzf60n1j8x11ce", "title": "자꾸 마음이 따끔거려도2", "size": "10*10*5cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2026", "image": "7ec541d2b3819bf15966ec7ae64cbe15", "webFile": "web/qhckbzqzf60n1j8x11ce.jpg", "order": 21},
+  {"id": "kdr75m340p21f2wywokq", "title": "자신의 잣대", "size": "10*10*5cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2026", "image": "9f6eac70924b7c6d38a1d47fcca3c13d", "webFile": "web/kdr75m340p21f2wywokq.jpg", "order": 22},
+  {"id": "ptjgcl2jodanfge6dt2i", "title": "자꾸 맘이 따끔거려도", "size": "10*10*5cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2026", "image": "d31836d91a99549f8c24c52333e9de58", "webFile": "web/ptjgcl2jodanfge6dt2i.jpg", "order": 23},
+  {"id": "tlm8lil604jpz8ueeljp", "title": "발견산책", "size": "21*15cm", "medium": "종이에 먹, 은분", "year": "2026", "image": "697a8b139b916182eeae64d095ddea26", "webFile": "web/tlm8lil604jpz8ueeljp.jpg", "order": 24},
+  {"id": "1x0s3b3664gd79rkl6fe", "title": "하스카프의 희망", "size": "53×45.5cm", "medium": "종이에 과슈, 자개", "year": "2026", "image": "102d418ff1cf78704487a5b965106633", "webFile": "web/1x0s3b3664gd79rkl6fe.jpg", "order": 25},
+  {"id": "83iy5li9gu1kt62x93gx", "title": "누구세요", "size": "22×22cm", "medium": "캔버스에 과슈, 오일파스텔", "year": "2026", "image": "dba5929034632363838a5d96ec00f450", "webFile": "web/83iy5li9gu1kt62x93gx.jpg", "order": 26},
+  {"id": "8xqpf7ew0tcjo783q5k5", "title": "햄짱이", "size": "41*32cm", "medium": "캔버스에 과슈, 오일파스텔", "year": "2026", "image": "6207d0f9ff0e852ed8772e62f309b84b", "webFile": "web/8xqpf7ew0tcjo783q5k5.jpg", "order": 27},
+  {"id": "r8deydtwfbouxzotic3y", "title": "진격의 햄짱이", "size": "28*22cm", "medium": "캔버스에 과슈, 오일파스텔", "year": "2026", "image": "071b74bf78f0aef6c9e7d8e22dd755ae", "webFile": "web/r8deydtwfbouxzotic3y.jpg", "order": 28},
+  {"id": "nhn4vigwo77se3eyn6z5", "title": "파란숲", "size": "143*76cm", "medium": "한지에 한국화물감 , 자개", "year": "2024", "image": "ea7d4dd1560b77cffefc85ea7d492f2e", "webFile": "web/nhn4vigwo77se3eyn6z5.jpg", "order": 29},
+  {"id": "indlgx98wmnsnjq1djh5", "title": "각자의 필터", "size": "54.9*42cm", "medium": "피그먼트프린트 / 사진", "year": "2024", "image": "8da2dd4572ccda511279bb1ee4be72e2", "webFile": "web/indlgx98wmnsnjq1djh5.jpg", "order": 30},
+  {"id": "hxusgxyngn6ppzqap8eo", "title": "여행자의 경계에서2 ", "size": "18*41cm", "medium": "피그먼트프린트 / 사진", "year": "2024", "image": "e039a520aa33747fd7819448724baaec", "webFile": "web/hxusgxyngn6ppzqap8eo.jpg", "order": 31},
+  {"id": "543s529gmc4tohqcteg0", "title": "핑크뮬리", "size": "54.9*42cm", "medium": "피그먼트프린트 / 사진", "year": "2024", "image": "69745bdb2811525f46d9611687958fd6", "webFile": "web/543s529gmc4tohqcteg0.jpg", "order": 32},
+  {"id": "mpotefpz0rm0nokbz2sx", "title": "여행자의 경계를 넘어볼까", "size": "15*21cm", "medium": "종이에 과슈, 오일파스텔", "year": "2024", "image": "b76cfa4f6e01817d980a8ca028cbf2ae", "webFile": "web/mpotefpz0rm0nokbz2sx.jpg", "order": 33},
+  {"id": "19uida15fevfwnfb0wl9", "title": "여행자의 경계에서3", "size": "15*21cm", "medium": "종이에 오일파스텔", "year": "2024", "image": "ed74df40e45cf6bc93341dbb2743214e", "webFile": "web/19uida15fevfwnfb0wl9.jpg", "order": 34},
+  {"id": "vlsc2wl525qtm8kpofw3", "title": "비슷하게 완벽했고", "size": "21*29.7cm", "medium": "종이에 오일파스텔", "year": "2024", "image": "0f208adad2ce8fdfdada16d772618ede", "webFile": "web/vlsc2wl525qtm8kpofw3.jpg", "order": 35},
+  {"id": "3rpavvdmiys8rfrw6sfd", "title": "비슷하게 불완전했던", "size": "21*29.7cm", "medium": "종이에 오일파스텔", "year": "2024", "image": "22de0d0e62f385c9b260f57733e15cf4", "webFile": "web/3rpavvdmiys8rfrw6sfd.jpg", "order": 36},
+  {"id": "dj42h5gsno3vlqe10v47", "title": "다시 봄이 찾아올까", "size": "21*29.7cm", "medium": "종이에 오일파스텔", "year": "2024", "image": "89b322ce935bfc89d2a38cb2da95fa94", "webFile": "web/dj42h5gsno3vlqe10v47.jpg", "order": 37},
+  {"id": "j6rqp9lec9oasv94ea33", "title": "미적거리는 영혼의 사분의일22", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "18ab1c0d076dad32bd754290a5ea009e", "webFile": "web/j6rqp9lec9oasv94ea33.jpg", "order": 38},
+  {"id": "7kj3k8z34m2m8lqzo9jr", "title": "미적거리는 영혼의 사분의일21", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "de0140645bca43c29732a313ca32df52", "webFile": "web/7kj3k8z34m2m8lqzo9jr.jpg", "order": 39},
+  {"id": "lk31sn63ysl1vjmzv196", "title": "미적거리는 영혼의 사분의일20", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "0f9b5c4d5e4de0a049c2b77fe02abd38", "webFile": "web/lk31sn63ysl1vjmzv196.jpg", "order": 40},
+  {"id": "2e6p4ewej5jy63n0lw3h", "title": "미적거리는 영혼의 사분의일19", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "dfac840c3a97dfa28c1b8fafce62dcb8", "webFile": "web/2e6p4ewej5jy63n0lw3h.jpg", "order": 41},
+  {"id": "5a0owa1bzt4tza4vaw0u", "title": "미적거리는 영혼의 사분의일18", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "742afd966a55d82c0e23eb321713c52c", "webFile": "web/5a0owa1bzt4tza4vaw0u.jpg", "order": 42},
+  {"id": "hztc52x2w7vpl2qn5pm5", "title": "미적거리는 영혼의 사분의일17", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "b9747fe62804964df6b6484b04d3ff88", "webFile": "web/hztc52x2w7vpl2qn5pm5.jpg", "order": 43},
+  {"id": "un8xybiqyaltbv1ie8mq", "title": "미적거리는 영혼의 사분의일16", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "518c43c682c40ac7a31d68fc9d1c56c9", "webFile": "web/un8xybiqyaltbv1ie8mq.jpg", "order": 44},
+  {"id": "5gl0tjgbndz4xbmcf425", "title": "미적거리는 영혼의 사분의일15", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "1ecb336ea676253dfab92d3cb1741bd6", "webFile": "web/5gl0tjgbndz4xbmcf425.jpg", "order": 45},
+  {"id": "hp0z2uaef264lh2ckq5h", "title": "미적거리는 영혼의 사분의일14", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "acc47b557c8f4f93762ebe86a91991b2", "webFile": "web/hp0z2uaef264lh2ckq5h.jpg", "order": 46},
+  {"id": "ox3w5ijce383fu32402v", "title": "미적거리는 영혼의 사분의일13", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "31f9f1409ffa2d78f23e8576555df9f6", "webFile": "web/ox3w5ijce383fu32402v.jpg", "order": 47},
+  {"id": "i9w9k4pcr9sp2lt9w6yi", "title": "미적거리는 영혼의 사분의일12", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "228216c789da78ad5b259e8f1ac466e8", "webFile": "web/i9w9k4pcr9sp2lt9w6yi.jpg", "order": 48},
+  {"id": "p2y3frgc2cuep02sgix7", "title": "미적거리는 영혼의 사분의일11", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "4cf46d1c4c3b914fce9add1e5cf86323", "webFile": "web/p2y3frgc2cuep02sgix7.jpg", "order": 49},
+  {"id": "ip14zbxp733uvcpaxzo4", "title": "미적거리는 영혼의 사분의일10", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "c4e84e2e13f8d7b04e15e49cb13425ec", "webFile": "web/ip14zbxp733uvcpaxzo4.jpg", "order": 50},
+  {"id": "gly0977cwabmt1ycilga", "title": "미적거리는 영혼의 사분의일9", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "c9c94273c9a976423d86a47565ac00a7", "webFile": "web/gly0977cwabmt1ycilga.jpg", "order": 51},
+  {"id": "9e2kcepu78y7m0ekdvhz", "title": "미적거리는 영혼의 사분의일8", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "5639e39e23614b9236f93827423ff39d", "webFile": "web/9e2kcepu78y7m0ekdvhz.jpg", "order": 52},
+  {"id": "e64sz25twvr9yoyf4a1p", "title": "미적거리는 영혼의 사분의일7", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "4ea071389b7414fbb0e73476315b86e2", "webFile": "web/e64sz25twvr9yoyf4a1p.jpg", "order": 53},
+  {"id": "th9c9ywfqflwpxirapx6", "title": "미적거리는 영혼의 사분의일6", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "59cf916e005110c9ea95aebb334c8b44", "webFile": "web/th9c9ywfqflwpxirapx6.jpg", "order": 54},
+  {"id": "e76y0l13e4wpcj8ihrgo", "title": "미적거리는 영혼의 사분의일5", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "3b89307960a89be1061707a9e4963367", "webFile": "web/e76y0l13e4wpcj8ihrgo.jpg", "order": 55},
+  {"id": "q7ocwbe82qtfdgcc8hvy", "title": "미적거리는 영혼의 사분의일4", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "2ab1da6186573a7d21dd6812759d724f", "webFile": "web/q7ocwbe82qtfdgcc8hvy.jpg", "order": 56},
+  {"id": "6l3kgrjglxzpag24yexe", "title": "미적거리는 영혼의 사분의일3", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "43c175bb0c3afe7303cec1c5932c6789", "webFile": "web/6l3kgrjglxzpag24yexe.jpg", "order": 57},
+  {"id": "bn8mjx3snksmt973uas8", "title": "미적거리는 영혼의 사분의일2", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "02016506bd7471c78e8776fe8b0d9eee", "webFile": "web/bn8mjx3snksmt973uas8.jpg", "order": 58},
+  {"id": "zbq287c0h52dwb6hsq1j", "title": "미적거리는 영혼의 사분의일1", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "add7b0ccccda210264d141b70f3164ad", "webFile": "web/zbq287c0h52dwb6hsq1j.jpg", "order": 59},
+  {"id": "vcw91oxdkuux7vria7q2", "title": "세상 모든 아름다움을 길어올리는 순간", "size": "20*20*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "8debb847941152d1d5342e72b10b5ed5", "webFile": "web/vcw91oxdkuux7vria7q2.jpg", "order": 60},
+  {"id": "akv79u7noo25yy7yle5z", "title": "꿈이 피어나는 나날들", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2023", "image": "7caba2e6833eb7db065e25a4827e5c8d", "webFile": "web/akv79u7noo25yy7yle5z.jpg", "order": 61},
+  {"id": "cb5mcpm5e5ykqdp9dc16", "title": "겨울은 봄을 이기지 못한다", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2023", "image": "5daec2d8fdf78e9409c29f7a11f87ba6", "webFile": "web/cb5mcpm5e5ykqdp9dc16.jpg", "order": 62},
+  {"id": "gmjucybvoqjh7hxijp2a", "title": "진정한 쉼", "size": "15*15*5cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "c463927ca30bb58165902a0e70eb8b1b", "webFile": "web/gmjucybvoqjh7hxijp2a.jpg", "order": 63},
+  {"id": "f7uyfqfetkq00bjrrncv", "title": "찾았다 그곳", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "4cd8e4fce2a87219969111613b3141c2", "webFile": "web/f7uyfqfetkq00bjrrncv.jpg", "order": 64},
+  {"id": "a48qspr72rum7mr1ry4y", "title": "길을 찾아서", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "bb6a22c565fa0a421ee5e7a6116bad77", "webFile": "web/a48qspr72rum7mr1ry4y.jpg", "order": 65},
+  {"id": "7odsd5vmqufmebu2aq6t", "title": "내 안의 새는 원하는 곳으로 날아간다", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "a2ef8ce4b601ec245c85da492155d298", "webFile": "web/7odsd5vmqufmebu2aq6t.jpg", "order": 66},
+  {"id": "dxakhjlk7l6xs8o5lsf0", "title": "내가 젤 잘 나가", "size": "10*10*5 cm", "medium": "캔버스에 아크릴릭, 자개", "year": "2022", "image": "1e3517666d8514754f60300fcbb9f9fe", "webFile": "web/dxakhjlk7l6xs8o5lsf0.jpg", "order": 67},
+  {"id": "fabh93ujykyrfe5sbgu2", "title": "본다는 것 그 너머", "size": "91*73cm", "medium": "종이에 아크릴과슈", "year": "2022", "image": "628f956c6aa9f72bece54c65c7d13f29", "webFile": "web/fabh93ujykyrfe5sbgu2.jpg", "order": 68},
+  {"id": "qh2sj5ttr75jqm4gbi69", "title": "지금 여기에", "size": "32*44cm", "medium": "종이에 한국화물감", "year": "2022", "image": "76647e5d10edf1bf3d5cac42abfd8911", "webFile": "web/qh2sj5ttr75jqm4gbi69.jpg", "order": 69},
+  {"id": "rg49f13e65p3t7ph4wvg", "title": "봄을 만나고 싶으면", "size": "44*32cm", "medium": "종이에 아크릴릭, 오일파스텔", "year": "2022", "image": "33d8deb36acb515b24eaeb8da05cb4e9", "webFile": "web/rg49f13e65p3t7ph4wvg.jpg", "order": 70},
+  {"id": "kes4n5nn48ybzw2mufhc", "title": "비행", "size": "47*65cm", "medium": "한지에 한국화물감", "year": "2017", "image": "a45aa3401fa99d0be0b685997aab2e4e", "webFile": "web/kes4n5nn48ybzw2mufhc.jpg", "order": 71},
+  {"id": "w6tz7x2c2xa1s2upf37g", "title": "벚꽃 떨어지 듯 천천히", "size": "60.6*72.7cm", "medium": "한지에 한국화물감, 자개", "year": "2017", "image": "2b47e9c79552db859f1b49d2dc52cc0b", "webFile": "web/w6tz7x2c2xa1s2upf37g.jpg", "order": 72},
+  {"id": "b0rrhrsto3fmkpwifgh6", "title": "달빛을 서성이며", "size": "47*65cm", "medium": "한지에 한국화물감", "year": "2017", "image": "85841e94c23e98aa0d8ef26b68c6522e", "webFile": "web/b0rrhrsto3fmkpwifgh6.jpg", "order": 73},
+  {"id": "q0pofvp9x3n09p2hn0di", "title": "길아 너 거기 있니", "size": "110*150cm", "medium": "한지에 한국화물감", "year": "2017", "image": "651ff62eef02c99e44decdff7ecca69a", "webFile": "web/q0pofvp9x3n09p2hn0di.jpg", "order": 74},
+  {"id": "uuaqvqvtuheyxu0urqkf", "title": "파란 하늘 날개에 담아", "size": "25*25cm", "medium": "한지에 한국화물감", "year": "2017", "image": "4c33f038a622cd7e186ffca188bf72bc", "webFile": "web/uuaqvqvtuheyxu0urqkf.jpg", "order": 75},
+  {"id": "9agbrmtqa2lysqe2jaga", "title": "날개에 이는 바람", "size": "30*30cm", "medium": "한지에 한국화물감", "year": "2017", "image": "8aa48955b1e9cca9616fae97d9991993", "webFile": "web/9agbrmtqa2lysqe2jaga.jpg", "order": 76},
+  {"id": "o4tknja5wnwcc04nzsb0", "title": "졸고 있던 벚꽃잎, 풍경소리에 놀라 떨어지네", "size": "40*40cm", "medium": "한지에 한국화물감, 자개", "year": "2017", "image": "e82f21bd5132b2f11931ecc7b174e4cf", "webFile": "web/o4tknja5wnwcc04nzsb0.jpg", "order": 77},
+  {"id": "mjoloayawa0bwo7l4sje", "title": "길은 언제나 끝나는 곳에서 다시 시작", "size": "25*25cm", "medium": "한지에 한국화물감", "year": "2017", "image": "18c128fbfed5b2095c30845a915cdb0c", "webFile": "web/mjoloayawa0bwo7l4sje.jpg", "order": 78},
+  {"id": "z71p1s2oktz4s53sd73u", "title": "혼자하는 술래잡기", "size": "30*30cm", "medium": "한지에 한국화물감,자개", "year": "2017", "image": "15f5dec6e7926c275ee6be21c96275dd", "webFile": "web/z71p1s2oktz4s53sd73u.jpg", "order": 79},
+  {"id": "ebl4h4hj0bsmzn5lw172", "title": "애쓰지 않음으로 애씀을", "size": "25*25cm", "medium": "한지에 한국화물감", "year": "2018", "image": "bf1e383f96408bb258ef361adce4839b", "webFile": "web/ebl4h4hj0bsmzn5lw172.jpg", "order": 80},
+  {"id": "dccq74028rfobwzsgq1t", "title": "여행자의 경계에서", "size": "60.6*72.7cm", "medium": "한지에 한국화물감, 먹, 자개", "year": "2017", "image": "d4acfd84e5592e94c357c06a9e6dfbd3", "webFile": "web/dccq74028rfobwzsgq1t.jpg", "order": 81},
+  {"id": "r9gfuxm46wzmjpumd1px", "title": "들려요, 내 말", "size": "60.6*72.7cm", "medium": "한지에 한국화물감", "year": "2016", "image": "bc07ca64fa59fcc42ef763b133ebfbf9", "webFile": "web/r9gfuxm46wzmjpumd1px.jpg", "order": 82},
+  {"id": "08o4ooza3s0k1ohuc9vd", "title": "설렘", "size": "62*91cm", "medium": "옻염색한지에 한국화물감", "year": "2016", "image": "5bd1113c06e2de828dece461b9c2666d", "webFile": "web/08o4ooza3s0k1ohuc9vd.jpg", "order": 83},
+  {"id": "v85l239bpjbiunx6xlwt", "title": "설렘2", "size": "47*62cm", "medium": "한지에 한국화물감", "year": "2016", "image": "b08ec894e1e7083fe38f5ada3c46a1da", "webFile": "web/v85l239bpjbiunx6xlwt.jpg", "order": 84},
+  {"id": "bzjgdmvq1p4qtn1f93z3", "title": "꿈에서 깨지 않을 거야", "size": "32*41cm", "medium": "한지에 한국화물감", "year": "2016", "image": "e171690f80b66a58e9f6477c39893947", "webFile": "web/bzjgdmvq1p4qtn1f93z3.jpg", "order": 85},
+  {"id": "dkq52izj0ujuq543s55p", "title": "파르라니 깎은 머리 박사고깔에 감추오고", "size": "45.5*53cm", "medium": "한지에 한국화물감", "year": "2016", "image": "d18d375bf949f63bb71c5d5535b1723a", "webFile": "web/dkq52izj0ujuq543s55p.jpg", "order": 86},
+  {"id": "mopf82j03xpmrftl6og5", "title": "변태", "size": "29*38cm", "medium": "한지에 한국화물감", "year": "2016", "image": "2dc8d35d8403fe3db0ab2c3ce728ac40", "webFile": "web/mopf82j03xpmrftl6og5.jpg", "order": 87},
+  {"id": "3v54ypfp158a6m2kbs1a", "title": "불현듯 솟아오르는 슬픈 욕심에도 길을 내 주자", "size": "53*45.5cm", "medium": "한지에 한국화물감, 자개", "year": "2017", "image": "812940aca6eff339b345679323ee73e1", "webFile": "web/3v54ypfp158a6m2kbs1a.jpg", "order": 88},
+  {"id": "xkcfnso2shmj73kmom34", "title": "멈칫거림은 설렘을 돋우고", "size": "45.5*53cm", "medium": "한지에 한국화물감, 자개", "year": "2017", "image": "d7d39215f0c4646c9c62a396cafef2ee", "webFile": "web/xkcfnso2shmj73kmom34.jpg", "order": 89},
+  {"id": "08ux44htep807gnqy0jy", "title": "부르는 이 없이 불리워 온 그곳", "size": "213*149cm", "medium": "한지에 한국화물감", "year": "2018", "image": "5c171380e5836d1dd20b7a787dcda1af", "webFile": "web/08ux44htep807gnqy0jy.jpg", "order": 90},
+  {"id": "2zg13gy3vbr34giarive", "title": "아니잊고", "size": "90*60cm", "medium": "한지에 한국화물감, 자개", "year": "2017", "image": "de656960040e82303499c66e0b84c6eb", "webFile": "web/2zg13gy3vbr34giarive.jpg", "order": 91},
+  {"id": "mgxnwt6j4u3xdbz9z2t6", "title": "화양연화", "size": "64*94cm", "medium": "한지에 한국화물감", "year": "2018", "image": "592264aeb3f1c2b558154bde79b724c7", "webFile": "web/mgxnwt6j4u3xdbz9z2t6.jpg", "order": 92},
+  {"id": "3kk9i8xu602vw9mlezcv", "title": "잊지 않을게", "size": "25*25cm", "medium": "한지에 한국화물감", "year": "2017", "image": "f20d2bcf7dc3e94a6fa55f06abeddbbf", "webFile": "web/3kk9i8xu602vw9mlezcv.jpg", "order": 93},
+  {"id": "b8blyod5x7htuzreg0dn", "title": "마음결 잇기", "size": "60*60cm", "medium": "한지에 채색", "year": "2017", "image": "23b0c87f89815c11914246b025e5b270", "webFile": "web/b8blyod5x7htuzreg0dn.jpg", "order": 94},
+  {"id": "ro1o19kwjgtcae6q1tyr", "title": "마음결 잇기2", "size": "27*76cm", "medium": "한지에 채색", "year": "2017", "image": "1837b8b02fdaa27e92c43a2bc4475d0d", "webFile": "web/ro1o19kwjgtcae6q1tyr.jpg", "order": 95},
+  {"id": "zksfmzgmgxx7bdliiewt", "title": "마음결 잇기3", "size": "76x83cm", "medium": "한지에 채색", "year": "2018", "image": "60d1d0869f296ba95e339d4b6756b8f2", "webFile": "web/zksfmzgmgxx7bdliiewt.jpg", "order": 96},
+  {"id": "47evrq8ck526ked3t9g8", "title": "한 걸음 떨어져 보아야", "size": "29.7*21cm", "medium": "종이에 한국화물감", "year": "2018", "image": "aa72942dca6f66beef5d40ba53039476", "webFile": "web/47evrq8ck526ked3t9g8.jpg", "order": 97},
+  {"id": "ptsx0ecslullevbz5uxv", "title": "새 작품", "size": "21*29.7cm", "medium": "종이에 한국화물감", "year": "2019", "image": "c1685a157126dafd4259d0e66e6be344", "webFile": "web/ptsx0ecslullevbz5uxv.jpg", "order": 98},
+  {"id": "f74gzpazsoqfr2uhj31k", "title": "나무들과 공기들의 뒤섞임을 가로질러", "size": "29.7*21cm", "medium": "종이에 한국화물감", "year": "2019", "image": "46bcbb4dae62cf9a11a93984f48ce1a8", "webFile": "web/f74gzpazsoqfr2uhj31k.jpg", "order": 99},
+  {"id": "7fjdze82gxrp5zf7akfu", "title": "달빛에 일렁이다", "size": "21*29.7cm", "medium": "종이에 한국화물감", "year": "2018", "image": "96775b61ddeeca5f24c6c61aad64195b", "webFile": "web/7fjdze82gxrp5zf7akfu.jpg", "order": 100},
+  {"id": "56oumh8tzlf68c3ypxxp", "title": "내가 서 있는 여기로 동이 트고", "size": "21*29.7cm", "medium": "종이에 한국화물감", "year": "2018", "image": "3de0e6d0f232116680ed45edea036fb6", "webFile": "web/56oumh8tzlf68c3ypxxp.jpg", "order": 101},
+];
+/* 로그인한 방문자는 공유 데이터베이스(works)의 최신 목록을, 로그인하지 않은 방문자는 위 공개용 목록을 본다. */
+const WORKS = [], worksListeners = [];
+let worksReady = false;
+const onWorks = fn => { worksListeners.push(fn); if (worksReady) fn(); };
+function setWorks(list) { WORKS.length = 0; WORKS.push(...list); worksReady = true; worksListeners.forEach(fn => fn()); }
+const imgSrc = d => d.image ? "/_blob/" + d.image : (d.src || "");
+/* 화면에는 긴 변 1200px 정도의 작은 사진(web)을 쓰고, 크게 보기에서만 원본을 불러온다 */
+const SNAPMAP = new Map(SNAPSHOT.map(w => [w.id, w]));
+const webSrc = (id, d) => d.webId ? "/_blob/" + d.webId : (SNAPMAP.get(id)?.webFile && SNAPMAP.get(id).image === d.image ? SNAPMAP.get(id).webFile : imgSrc(d));
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fallback = Promise.resolve(SNAPSHOT.map(w => ({ ...w, src: imgSrc(w), web: webSrc(w.id, w) })).filter(w => w.src));
+const DB = (async () => { try { return await window.claude?.use?.("db"); } catch { return null; } })();
+(async () => {
+  const db = await DB;
+  if (!db) { setWorks(await fallback); return; }
+  db.collection("works").orderBy("order").onSnapshot(snap => {
+    if (snap.empty) { fallback.then(list => { if (!worksReady || !WORKS.length) setWorks(list); }); return; }
+    setWorks(snap.docs.map(d => ({ id: d.id, ...d.data(), src: imgSrc(d.data()), web: webSrc(d.id, d.data()) })).filter(w => !w.hidden && w.src));
+  }, async () => { if (!worksReady) setWorks(await fallback); });
+})();
+const isNarrow = () => innerWidth < 640;
+const gid = id => document.getElementById(id), clampN = (v, a, b) => Math.min(b, Math.max(a, v));
+const seededN = i => { const x = Math.sin(i * 12.9898 + 4.1) * 43758.5453; return x - Math.floor(x); };
+const meta = w => [w.size, w.medium, w.year].filter(Boolean).join("  ·  ") + (w.desc ? "\n" + w.desc : "");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ───────── 인트로: 어둠 속에서 한 줄로 그려지는 아이, 넓은 붓질로 칠해지는 색 ─────────
+   모든 선(머리·몸·팔·손·책장·실)은 같은 펜 하나로 그린다: 필압에 따라 굵기가 변하고,
+   끝이 가늘어지고, 손그림 애니메이션처럼 미세하게 떨린다. 그 다음 넓은 붓질이 어둠을 종이색으로 덮고,
+   그림 위로 색이 크게 크게 칠해진다. */
+(() => {
+  const intro = document.getElementById("intro"), fig = document.getElementById("figure");
+  const paperBg = document.getElementById("paper-bg");
+  const hint = document.getElementById("hint"), stairs = document.getElementById("stairs");
+  const $ = id => document.getElementById(id), NS = "http://www.w3.org/2000/svg";
+  const mk = (parent, tag, attrs = {}) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; };
+
+  const clamp = v => Math.min(1, Math.max(0, v));
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const easeInOutSine = t => -(Math.cos(Math.PI * t) - 1) / 2;
+  const easeOut = t => 1 - Math.pow(1 - t, 3);
+  const seg = (t, a, b) => clamp((t - a) / (b - a));
+  const lerp = (a, b, p) => a + (b - a) * p;
+  const P = (x, y) => ({ x, y });
+  const add = (a, b) => P(a.x + b.x, a.y + b.y), sub = (a, b) => P(a.x - b.x, a.y - b.y), mul = (a, k) => P(a.x * k, a.y * k);
+  const len = a => Math.hypot(a.x, a.y), norm = a => mul(a, 1 / (len(a) || 1));
+  const mixP = (a, b, p) => P(lerp(a.x, b.x, p), lerp(a.y, b.y, p));
+  const f = n => n.toFixed(1);
+  function smooth(pts, closed = false) { // 점들을 지나는 부드러운 곡선
+    const n = pts.length; if (n < 2) return "";
+    const at = i => closed ? pts[(i + n) % n] : pts[Math.max(0, Math.min(n - 1, i))];
+    let d = `M${f(pts[0].x)} ${f(pts[0].y)}`;
+    for (let i = 0; i < (closed ? n : n - 1); i++) {
+      const p0 = at(i - 1), p1 = at(i), p2 = at(i + 1), p3 = at(i + 2);
+      const c1 = add(p1, mul(sub(p2, p0), 1 / 6)), c2 = sub(p2, mul(sub(p3, p1), 1 / 6));
+      d += ` C${f(c1.x)} ${f(c1.y)} ${f(c2.x)} ${f(c2.y)} ${f(p2.x)} ${f(p2.y)}`;
+    }
+    return closed ? d + "Z" : d;
+  }
+
+  /* ── 펜: 점들을 따라 필압·끝 가늘어짐·떨림이 있는 한 획을 만든다 ── */
+  const STEP = 5;
+  function sampleCR(pts, closed = false) { // 점들을 지나는 곡선을 촘촘한 점으로
+    const n = pts.length, out = [];
+    if (n < 2) return pts.slice();
+    const at = i => closed ? pts[(i + n) % n] : pts[Math.max(0, Math.min(n - 1, i))];
+    for (let i = 0; i < (closed ? n : n - 1); i++) {
+      const p0 = at(i - 1), p1 = at(i), p2 = at(i + 1), p3 = at(i + 2);
+      const c1 = add(p1, mul(sub(p2, p0), 1 / 6)), c2 = sub(p2, mul(sub(p3, p1), 1 / 6));
+      cubic(p1, c1, c2, p2, out, i > 0);
+    }
+    return out;
+  }
+  function cubic(a, b, c, d, out, skipFirst) {
+    const k = Math.max(2, Math.ceil((len(sub(b, a)) + len(sub(c, b)) + len(sub(d, c))) / STEP));
+    for (let i = skipFirst ? 1 : 0; i <= k; i++) {
+      const t = i / k, u = 1 - t;
+      out.push(P(u * u * u * a.x + 3 * u * u * t * b.x + 3 * u * t * t * c.x + t * t * t * d.x, u * u * u * a.y + 3 * u * u * t * b.y + 3 * u * t * t * c.y + t * t * t * d.y));
+    }
+    return out;
+  }
+  const noise = (x, s) => Math.sin(x * 1.7 + s) * .5 + Math.sin(x * .63 + s * 2.1) * .35 + Math.sin(x * 3.1 + s * .7) * .15;
+  let boil = 0, reveal = 1; // boil: 떨림 위상, reveal: 처음 그려지는 진행도
+  const strokes = [];
+  function pen(parent, opt = {}) {
+    const el = mk(parent, "path", { class: "ink" });
+    const st = { el, w: opt.w || 4.2, seed: opt.seed ?? strokes.length * 2.37 + 1, closed: !!opt.closed, order: opt.order ?? strokes.length, cap: opt.cap || 700, pts: [], from: 0, to: 1 };
+    strokes.push(st); return st;
+  }
+  function ink(st, pts) { // 획을 그린다 (reveal 구간만큼만)
+    st.pts = pts;
+    const n = pts.length; if (n < 2) { st.el.setAttribute("d", ""); return; }
+    const S = [0]; for (let i = 1; i < n; i++) S.push(S[i - 1] + len(sub(pts[i], pts[i - 1])));
+    const L = S[n - 1]; st.len = L;
+    const vis = st.visLen != null ? st.visLen : clamp((reveal - st.from) / ((st.to - st.from) || 1)) * L;
+    if (vis <= 1) { st.el.setAttribute("d", ""); return; }
+    const left = [], right = [], b = boil * 1.7;
+    for (let i = 0; i < n && S[i] <= vis; i++) {
+      const p = pts[i], q0 = pts[Math.max(0, i - 1)], q1 = pts[Math.min(n - 1, i + 1)];
+      const tn = norm(sub(q1, q0)), nn = P(-tn.y, tn.x), s = S[i];
+      const end = Math.min(vis, L);
+      const taper = st.closed ? 1 : .2 + .8 * Math.pow(clamp(Math.min(s / 34, (end - s) / 34)), .6);
+      const w = st.w * taper * (1 + .24 * noise(s / 46, st.seed)) / 2;
+      const j = .9 * noise(s / 22, st.seed + b);
+      left.push(add(p, mul(nn, j + w))); right.push(add(p, mul(nn, j - w)));
+    }
+    const pt = q => `${f(q.x)} ${f(q.y)}`;
+    st.el.setAttribute("d", "M" + left.map(pt).join("L") + "L" + right.reverse().map(pt).join("L") + "Z");
+    st.tip = left.length ? mixP(left[left.length - 1], right[0], .5) : pts[0];
+  }
+
+  /* ── 머리와 어깨: 원본의 비례를 따라 다시 그은 선 ── */
+  const BODY = [[[478,379],[487,368],[493,356],[498,333],[509,307],[523,287],[544,266],[568,252],[587,247],[608,248],[626,256]],[[795,319],[795,317],[772,298],[733,257],[717,244],[697,233],[674,226],[646,225],[627,229],[611,239]],[[796,320],[801,326]],[[766,311],[771,314]],[[784,421],[790,416],[799,399],[802,388],[802,369],[798,354],[789,335],[772,315]],[[783,420],[782,399],[777,387],[775,386]],[[479,380],[494,372],[502,364],[510,351]],[[468,386],[476,381]],[[496,378],[486,399],[486,415],[489,425],[494,434],[504,445],[514,452],[529,458]],[[562,436],[558,435],[549,424],[548,405],[553,389],[561,374],[571,364],[578,361],[586,362],[593,368],[597,376],[599,392],[602,398],[606,402],[615,405],[631,404],[650,396],[670,378],[682,363],[688,360],[697,361],[711,369],[721,372],[758,373],[769,378],[774,385]],[[530,457],[527,444],[528,428],[537,412],[547,400]],[[564,437],[576,435],[581,430],[582,422],[578,417],[572,417],[567,422],[563,435]],[[563,437],[561,443],[561,459]],[[514,494],[527,472],[530,461]],[[515,495],[527,492],[539,485],[550,475],[560,460]],[[561,461],[566,482],[572,494],[584,510],[597,523],[615,537],[625,542],[637,545]],[[657,543],[639,545]],[[774,387],[766,416],[756,437],[748,448],[727,469],[721,480],[715,498],[710,506],[702,515],[670,537]],[[507,498],[487,500],[476,506]],[[514,495],[508,498]],[[508,499],[496,509],[485,514]],[[475,507],[474,514],[481,527],[509,554],[530,568],[546,576],[574,585],[602,586],[619,580],[631,568],[636,557],[638,546]],[[363,591],[375,570],[389,552],[411,533],[474,506]],[[728,597],[716,573],[698,554],[670,538]]];
+  const headG = mk($("body-lines"), "g");
+  const rdp = (pts, eps) => { // 선을 단순하게 정리
+    if (pts.length < 3) return pts;
+    const a = pts[0], b = pts[pts.length - 1], ab = sub(b, a), L = len(ab) || 1;
+    let mi = 0, md = 0;
+    for (let i = 1; i < pts.length - 1; i++) { const d = Math.abs(ab.x * (pts[i].y - a.y) - ab.y * (pts[i].x - a.x)) / L; if (d > md) { md = d; mi = i; } }
+    return md > eps ? rdp(pts.slice(0, mi + 1), eps).slice(0, -1).concat(rdp(pts.slice(mi), eps)) : [a, b];
+  };
+  const HEAD_ORDER = [12, 13, 14, 16, 17, 18, 19, 20, 9, 10, 11, 7, 8, 6, 5, 0, 1, 2, 3, 4, 15, 21, 22, 23];
+  const headStrokes = BODY.map((pts, i) => ({ st: pen(headG, { order: 20 + (HEAD_ORDER.indexOf(i) + 1 || 40), w: 4.4 }), pts: sampleCR(rdp(pts.map(([x, y]) => P(x, y)), 3)) }));
+  // 겨드랑이 아래 몸통 (책이 커지면 가려진다)
+  headStrokes.push({ st: pen($("body-lines"), { order: 60 }), pts: cubic(P(432, 650), P(426, 720), P(428, 800), P(438, 900), []) });
+  headStrokes.push({ st: pen($("body-lines"), { order: 61 }), pts: cubic(P(700, 656), P(708, 730), P(706, 810), P(694, 905), []) });
+
+  /* ── 책: 책등을 축으로 회전하는 책장들 (원본의 원근에 맞춘 비율) ── */
+  const W = 240, DEPTH = 150, LIFT = .5, TOP = .74;
+  const pages = [
+    { th: .30, role: "base" }, { th: .33, role: "base" }, { th: .36, role: "base" },
+    { th: .44, role: "flip", k: 1 }, { th: .41, role: "flip", k: 0 },
+    { th: .48, role: "cover" },
+  ];
+  pages.forEach((pg, i) => { pg.fill = mk($("book-fills"), "path", { class: "pg" }); pg.line = pen($("book-fills"), { closed: true, order: 80 + i, w: 3.8 }); pg.th0 = pg.th; pg.thTop = pg.th; });
+  let book = {};
+  const bp = q => { const c = Math.cos(book.rot), s = Math.sin(book.rot), x = q.x * book.s, y = q.y * book.s; return P(book.x + x * c - y * s, book.y + x * s + y * c); };
+  function pageGeo(thB, thT) { // 아래 모서리와 위 모서리가 따로 움직여 종이가 휜다
+    const Vb = P(W * Math.cos(thB), -W * LIFT * Math.sin(thB));
+    const Vt = P(W * TOP * Math.cos(thT), -DEPTH - W * TOP * LIFT * Math.sin(thT));
+    const gb = W * .12 * Math.abs(Math.cos(thB)), gt = W * .08 * Math.abs(Math.cos(thT));
+    const q = {
+      B: P(0, 0), T: P(0, -DEPTH), Ob: Vb, Ot: Vt,
+      b1: P(Vb.x * .1, Vb.y * .4 - gb), b2: P(Vb.x * .5, Vb.y * .8 - gb * .55),
+      t1: P(Vt.x * .55, Vt.y + gt * .55), t2: P(Vt.x * .12, -DEPTH + (Vt.y + DEPTH) * .3 + gt * .45),
+    };
+    for (const k in q) q[k] = bp(q[k]);
+    const { B, T, Ob, Ot, b1, b2, t1, t2 } = q;
+    const pts = cubic(B, b1, b2, Ob, []); cubic(Ob, mixP(Ob, Ot, .33), mixP(Ob, Ot, .66), Ot, pts, true); cubic(Ot, t1, t2, T, pts, true); cubic(T, mixP(T, B, .33), mixP(T, B, .66), B, pts, true);
+    return { d: `M${f(B.x)} ${f(B.y)} C${f(b1.x)} ${f(b1.y)} ${f(b2.x)} ${f(b2.y)} ${f(Ob.x)} ${f(Ob.y)} L${f(Ot.x)} ${f(Ot.y)} C${f(t1.x)} ${f(t1.y)} ${f(t2.x)} ${f(t2.y)} ${f(T.x)} ${f(T.y)} Z`, pts, edge: fr => mixP(Ob, Ot, fr), Ob, Ot };
+  }
+
+  /* ── 팔과 손: 어깨에서 손까지 두 마디 IK ── */
+  const SL = P(394, 612), SR = P(722, 616), L1 = 172, L2 = 150;
+  const arm = (side, o) => ({ side, fill: mk($("arms"), "path", { class: "pg" }), a: pen($("arms"), { order: o }), b: pen($("arms"), { order: o + 1 }), cuff: pen($("arms"), { order: o + 2, w: 3.6 }) });
+  const armL = arm(-1, 10), armR = arm(1, 64);
+  const hand = o => ({ fill: mk($("hands"), "path", { class: "pg" }), a: pen($("hands"), { order: o, w: 3.8 }), b: pen($("hands"), { order: o + 1, w: 3.6 }) });
+  const handL = hand(14), handR = hand(68);
+  function elbow(S, H, side) {
+    const v = sub(H, S), d = Math.min(len(v), L1 + L2 - 2);
+    const a = Math.acos(Math.max(-1, Math.min(1, (L1 * L1 + d * d - L2 * L2) / (2 * L1 * d))));
+    const base = Math.atan2(v.y, v.x);
+    const c1 = add(S, P(L1 * Math.cos(base + a), L1 * Math.sin(base + a))), c2 = add(S, P(L1 * Math.cos(base - a), L1 * Math.sin(base - a)));
+    const score = e => -Math.abs(e.x - (S.x + side * 8)) + e.y * .4; // 위팔은 몸 옆으로 곧게 내려오고, 아래팔만 책을 향한다
+    return score(c1) > score(c2) ? c1 : c2;
+  }
+  // 팔 굵기: 반소매(조금 넓고 끝단이 살짝 벌어짐) → 팔꿈치 → 가늘어지는 손목
+  const armW = u => u < .26 ? lerp(22, 24, u / .26) : u < .32 ? lerp(24, 14, ease((u - .26) / .06)) : u < .55 ? lerp(14, 13, (u - .32) / .23) : lerp(13, 10, (u - .55) / .45);
+  function drawArm(A, S, Hraw) {
+    // 위팔은 어깨에 매달려 손 쪽으로 조금만 기울고, 아래팔은 팔꿈치에서 손으로 향한다
+    // (앞으로 뻗은 아래팔은 정면에서 짧아 보인다)
+    const H = Hraw, ang = Math.max(-.62, Math.min(.62, (H.x - S.x) / 400));
+    let E = add(S, P(Math.sin(ang) * L1, Math.cos(ang) * L1));
+    if (H.y < E.y - 30) E = add(E, P(A.side * Math.min(40, (E.y - H.y) * .3), -Math.min(30, (E.y - H.y) * .25))); // 손을 들면 팔꿈치도 따라 살짝 들린다
+    // 위팔은 어깨에서 살짝 바깥으로 둥글게, 아래팔은 팔꿈치에서 손목으로 곧게
+    const bow = P((E.y - S.y) * .08 * A.side, 0);
+    const center = sampleCR([S, add(mixP(S, E, .5), bow), E, mixP(E, H, .5), H]);
+    const n = center.length, outer = [], inner = [];
+    let acc = [0]; for (let i = 1; i < n; i++) acc.push(acc[i - 1] + len(sub(center[i], center[i - 1])));
+    const total = acc[n - 1] || 1;
+    let hem = 0;
+    for (let i = 0; i < n; i++) {
+      const p = center[i], tn = norm(sub(center[Math.min(n - 1, i + 1)], center[Math.max(0, i - 1)]));
+      const nn = mul(P(-tn.y, tn.x), A.side), w = armW(acc[i] / total);
+      outer.push(add(p, mul(nn, w))); inner.push(sub(p, mul(nn, w)));
+      if (!hem && acc[i] / total >= .3) hem = i;
+    }
+    ink(A.a, outer); ink(A.b, inner.slice().reverse()); // 바깥 윤곽은 어깨→손목, 안쪽은 손목→겨드랑이
+    const ho = outer[hem], hi = inner[hem], hm = mixP(ho, hi, .5);
+    ink(A.cuff, sampleCR([ho, add(hm, mul(norm(sub(center[hem + 1], center[hem])), 6)), hi]));
+    A.fill.setAttribute("d", smooth(outer.concat(inner.slice().reverse()), true));
+    return { E, H, dir: norm(sub(H, mixP(E, H, .6))), outer };
+  }
+  const HAND = [[0, -12], [12, -17], [25, -17], [35, -11], [40, -5], [32, -1], [40, 3], [39, 10], [31, 10], [37, 15], [33, 21], [23, 20], [11, 17], [0, 12]];
+  const THUMB = [[8, -13], [12, -24], [23, -31], [31, -26]];
+  function drawHand(el, H, u, flip, curl = 0) {
+    const n = P(-u.y * flip, u.x * flip), k = 1.25;
+    const tr = ([x, y]) => add(H, add(mul(u, x * k * (1 - curl * .2)), mul(n, y * k)));
+    el.fill.setAttribute("d", smooth(HAND.map(tr), true));
+    ink(el.a, sampleCR(HAND.map(tr))); ink(el.b, sampleCR(THUMB.map(tr)));
+  }
+
+  /* ── 실: 몸에서 이어져 화면 끝까지, 늘 흔들린다 ── */
+  const threadL = pen($("threads"), { order: 0, w: 3.4, cap: 900 }), threadR = pen($("threads"), { order: 99, w: 3.4, cap: 900 });
+  function drawThreads(time, eL, hR) {
+    const w = time / 1000;
+    const sway = (p, i, a) => P(p.x + Math.sin(w * .8 + i * 1.3) * a * .4, p.y + Math.sin(w * 1.1 + i * .9) * a);
+    const L = [eL, add(eL, P(-44, 80)), add(eL, P(8, 130)), add(eL, P(-34, 160)), P(110, 990), P(-330, 1010), P(-1000, 975), P(-1900, 950)];
+    const R = [hR, add(hR, P(58, 88)), add(hR, P(148, 160)), add(hR, P(96, 220)), P(1170, 1000), P(1700, 985), P(2400, 965), P(3300, 945)];
+    ink(threadL, sampleCR(L.map((p, i) => i ? sway(p, i, Math.min(34, i * 7)) : p).reverse())); // 화면 왼쪽 끝에서 들어와
+    ink(threadR, sampleCR(R.map((p, i) => i ? sway(p, i + 3, Math.min(34, i * 7)) : p)));          // 오른쪽 끝으로 빠져나간다
+  }
+
+
+  /* ── 한붓그리기: 모든 선을 펜을 떼지 않는 한 줄로 잇는다 ── */
+  // 1) 책을 펼쳐 든 자세로 각 부분의 선을 한 번 계산한다
+  book = { s: 1, x: 560, y: 895, rot: 0 };
+  pages[5].th = pages[5].thTop = Math.PI - .3;
+  pages.filter(p => p.role === "flip").forEach(p => { p.th = p.thTop = Math.PI - .33 - p.k * .03; });
+  pages.forEach(p => { p.geo = pageGeo(p.th, p.thTop); });
+  const aL = drawArm(armL, SL, pages[5].geo.edge(.4)), aR = drawArm(armR, SR, pages[2].geo.edge(.4));
+  drawHand(handL, aL.H, aL.dir, 1); drawHand(handR, aR.H, aR.dir, -1);
+  headStrokes.forEach(h => ink(h.st, h.pts));
+  drawThreads(0, aL.outer[9], add(aR.H, P(-8, 18)));
+  pages.forEach(p => ink(p.line, p.geo.pts));
+  fig.querySelectorAll("path").forEach(e => e.style.display = "none"); // 낱낱의 선은 감추고 한 줄만 보인다
+
+  // 2) 책에 가려지는 팔·몸통 부분은 잘라낸다
+  const inside = (q, poly) => { let c = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const a = poly[i], b = poly[j]; if ((a.y > q.y) !== (b.y > q.y) && q.x < (b.x - a.x) * (q.y - a.y) / (b.y - a.y) + a.x) c = !c; } return c; };
+  const covers = [pages[5].geo.pts, pages[2].geo.pts];
+  const uncovered = pts => { const out = []; let cur = []; pts.forEach(q => { if (covers.some(poly => inside(q, poly))) { if (cur.length > 3) out.push(cur); cur = []; } else cur.push(q); }); if (cur.length > 3) out.push(cur); return out; };
+  const pieces = (sts, trim) => sts.flatMap(st => (trim ? uncovered(st.pts) : [st.pts])).filter(p => p.length > 4 && len(sub(p[0], p[p.length - 1])) + p.length * 2 > 24);
+
+  // 3) 부분마다 가까운 끝점부터 이어 가며, 사이는 부드러운 곡선으로 잇는다
+  const bottomEdge = p => p.geo.pts.slice(0, Math.round(p.geo.pts.length * .3)); // 책 두께를 보여 주는 아래 모서리
+  const GROUPS = [
+    { exit: P(470, 470), list: pieces([armL.a, armL.cuff, armL.b], true).concat(pieces([handL.a, handL.b])) },
+    { exit: P(700, 600), list: pieces(headStrokes.slice(0, -2).map(h => h.st), true) },
+    { exit: P(800, 860), list: pieces([armR.a, armR.cuff, armR.b], true).concat(pieces([handR.a, handR.b])) },
+    { exit: P(900, 880), list: [pages[5].geo.pts, pages[2].geo.pts, bottomEdge(pages[4]), bottomEdge(pages[1])], loops: 2 },
+  ];
+  const ONE = [], SLOW = [];
+  const push = (pts, slow) => pts.forEach(q => { ONE.push(q); SLOW.push(slow); });
+  push(threadL.pts, false); // 화면 왼쪽 끝에서 들어온다
+  const tangent = (pts, atEnd) => atEnd ? norm(sub(pts[pts.length - 1], pts[Math.max(0, pts.length - 4)])) : norm(sub(pts[Math.min(pts.length - 1, 3)], pts[0]));
+  function bridge(next) {
+    const a = ONE[ONE.length - 1], b = next[0], d = Math.min(90, len(sub(b, a)) * .45);
+    const ta = norm(sub(a, ONE[Math.max(0, ONE.length - 4)])), tb = tangent(next, false);
+    push(cubic(a, add(a, mul(ta, d)), sub(b, mul(tb, d)), b, []).slice(1, -1), true);
+  }
+  GROUPS.forEach(group => {
+    // 닫힌 윤곽(책장)은 펜이 있는 곳에서 가장 가까운 점부터 돌기 시작한다
+    const left = group.list.map((p, i) => ({ p, closed: i < (group.loops || 0) }));
+    while (left.length) {
+      const a = ONE[ONE.length - 1];
+      let best = null;
+      left.forEach((it, i) => {
+        const opts = it.closed ? [it.p.reduce((bi, q, k) => len(sub(q, a)) < len(sub(it.p[bi], a)) ? k : bi, 0)].map(k => ({ pts: it.p.slice(k).concat(it.p.slice(1, k + 1)) }))
+                               : [{ pts: it.p }, { pts: it.p.slice().reverse() }];
+        opts.forEach(o => { // 가까운 것부터, 다음 부분으로 나가는 쪽 조각은 나중에
+          const cost = len(sub(o.pts[0], a)) + (left.length > 1 ? .35 * (600 - Math.min(600, len(sub(o.pts[o.pts.length - 1], group.exit)))) : 0);
+          if (!best || cost < best.cost) best = { cost, i, pts: o.pts };
+        });
+      });
+      left.splice(best.i, 1);
+      bridge(best.pts); push(best.pts, true);
+    }
+  });
+  bridge(threadR.pts); push(threadR.pts, false); // 오른쪽 끝으로 빠져나간다
+  // 실 부분은 빠르게, 그림 부분은 천천히 그려지도록 진행 거리에 가중치를 둔다
+  const ACC = [0], WACC = [0];
+  for (let i = 1; i < ONE.length; i++) { const d = len(sub(ONE[i], ONE[i - 1])); ACC.push(ACC[i - 1] + d); WACC.push(WACC[i - 1] + d * (SLOW[i] ? 1 : .22)); }
+  const lineG = mk(fig, "g");
+  const one = { el: mk(lineG, "path", { class: "ink" }), w: 4.4, seed: 3.1, closed: false };
+  const visLenAt = p => { const target = p * WACC[WACC.length - 1]; let lo = 0, hi = WACC.length - 1; while (lo < hi) { const m = (lo + hi) >> 1; if (WACC[m] < target) lo = m + 1; else hi = m; } return ACC[lo]; };
+
+  /* ── 물감: 위에서 방울이 무작위로 톡톡 떨어지고, 떨어진 자리마다 번져 색이 쌓인다 ── */
+  const defs = fig.querySelector("defs");
+  const filt = (id, freq, scale, blur) => { const fl = mk(defs, "filter", { id, x: "-30%", y: "-30%", width: "160%", height: "160%" }); mk(fl, "feTurbulence", { type: "fractalNoise", baseFrequency: freq, numOctaves: 4, seed: 6, result: "n" }); mk(fl, "feDisplacementMap", { in: "SourceGraphic", in2: "n", scale, xChannelSelector: "R", yChannelSelector: "G" }); mk(fl, "feGaussianBlur", { stdDeviation: blur }); };
+  filt("blot", ".035", 22, .5); filt("blot-big", ".012", 60, 1.5);
+  const paintG = mk(fig, "g", { style: "mix-blend-mode:multiply" });
+  fig.insertBefore(paintG, lineG);
+  const dropG = mk(fig, "g");
+  const REGIONS = [
+    { c: "#4a63c8", o: .5,  w: 72,  at: 0,    pts: [[468, 330], [640, 262], [492, 300], [690, 322], [470, 378], [668, 396]] },
+    { c: "#ec8fae", o: .46, w: 78,  at: 380,  pts: [[404, 640], [720, 628], [392, 700], [732, 698], [412, 752], [712, 752]] },
+    { c: "#f2c14e", o: .46, w: 70,  at: 760,  pts: [[330, 800], [790, 788], [318, 856], [802, 848], [360, 892], [762, 886]] },
+    { c: "#f0ad92", o: .38, w: 52,  at: 1080, pts: [[540, 424], [640, 404], [556, 470], [632, 462]] },
+    { c: "#f0ad92", o: .3,  w: 44,  at: 1300, pts: [[368, 640], [356, 770], [374, 840]] },
+    { c: "#f0ad92", o: .3,  w: 44,  at: 1420, pts: [[748, 640], [760, 770], [744, 840]] },
+    { c: "#9fd6da", o: .3,  w: 230, at: 1700, pts: [[-380, 150], [80, 40], [-340, 330], [110, 260]] },
+    { c: "#f4b6c8", o: .28, w: 230, at: 1950, pts: [[1150, 120], [1650, 220], [1180, 330], [1640, 400]] },
+    { c: "#f7d98f", o: .28, w: 230, at: 2200, pts: [[1120, 1050], [1650, 980], [1150, 1240], [1660, 1200]] },
+    { c: "#b9c2f0", o: .26, w: 230, at: 2450, pts: [[-380, 1020], [120, 1110], [-360, 1240], [140, 1260]] },
+  ].map((d, k) => {
+    const pts = d.pts.map(([x, y]) => P(x, y));
+    const hit = mul(pts.reduce((s, q) => add(s, q), P(0, 0)), 1 / pts.length);
+    const xs = pts.map(q => q.x), ys = pts.map(q => q.y);
+    const rx = (Math.max(...xs) - Math.min(...xs)) / 2 + d.w * .35, ry = (Math.max(...ys) - Math.min(...ys)) / 2 + d.w * .35;
+    // 영역 위 아무 곳에나 물감 방울이 톡톡 떨어져, 떨어진 자리마다 번지며 색이 쌓인다
+    const rnd = (a, b) => a + Math.random() * (b - a), big = d.w > 150;
+    const count = Math.random() < .5 ? 1 : 2; // 색마다 큰 방울 한두 개
+    const drops = Array.from({ length: count }, (_, j) => {
+      const ang = rnd(0, Math.PI * 2), rr = count === 1 ? rnd(0, .15) : rnd(.25, .45);
+      const at = add(hit, P(Math.cos(ang) * rx * rr, Math.sin(ang) * ry * rr));
+      const r = (big ? rnd(230, 300) : (rx + ry) / 2 * (count === 1 ? rnd(1, 1.15) : rnd(.8, .95))), op = d.o * rnd(.8, 1);
+      const blot = mk(paintG, "circle", { cx: f(at.x), cy: f(at.y), r: 0, fill: d.c, "fill-opacity": op.toFixed(3), stroke: d.c, "stroke-opacity": (op * .9).toFixed(3), "stroke-width": big ? 3 : 2, filter: big ? "url(#blot-big)" : "url(#blot)" });
+      const fall = mk(dropG, "ellipse", { cx: f(at.x), cy: -900, rx: 0, ry: 0, fill: d.c, "fill-opacity": .85 });
+      const splash = Array.from({ length: 4 }, () => ({ a: rnd(0, Math.PI * 2), dist: rnd(.6, 1.3), e: mk(dropG, "circle", { r: 0, fill: d.c, "fill-opacity": .65 }) }));
+      return { at, r, blot, fall, splash, delay: d.at * 1.25 + j * rnd(450, 750) + rnd(0, 200), size: big ? rnd(24, 32) : rnd(15, 21) };
+    });
+    return { ...d, drops };
+  });
+
+  /* ── 시간표 (ms) ── */
+  const T = { draw: [300, 7000], drops: 7400, fall: 1150, spread: 1300, title: 12900, textDrops: 13900, done: 14300 };
+  const END = 16000;
+  function render(t, now) {
+    boil = Math.floor(now / 110); // 초당 9번쯤 선이 다시 그려져 손그림처럼 떨린다
+    one.visLen = visLenAt(easeInOutSine(seg(t, ...T.draw)));
+    ink(one, ONE);
+    REGIONS.forEach(d => d.drops.forEach(p => {
+      const t0 = T.drops + p.delay, pf = seg(t, t0, t0 + T.fall), falling = pf > 0 && pf < 1;
+      // 위에서 떨어지는 방울 (떨어질수록 길쭉해진다)
+      p.fall.setAttribute("cy", f(lerp(-900, p.at.y, pf * (.35 + .65 * pf))));
+      p.fall.setAttribute("rx", falling ? f(p.size * .75) : 0); p.fall.setAttribute("ry", falling ? f(p.size * (1 + pf)) : 0);
+      // 닿는 순간 톡 튀고, 그 자리에 번진다 (천천히 조금 더 스며든다)
+      const q = seg(t, t0 + T.fall, t0 + T.fall + 650);
+      p.splash.forEach(sp => {
+        const rr = p.r * sp.dist * easeOut(q);
+        sp.e.setAttribute("cx", f(p.at.x + Math.cos(sp.a) * rr)); sp.e.setAttribute("cy", f(p.at.y + Math.sin(sp.a) * rr * .8));
+        sp.e.setAttribute("r", q > 0 && q < 1 ? f(p.size * .32 * (1 - q)) : 0);
+      });
+      const g = easeOut(seg(t, t0 + T.fall, t0 + T.fall + T.spread)) * .9 + easeOut(seg(t, t0 + T.fall + 500, t0 + T.fall + 3200)) * .14;
+      p.blot.setAttribute("r", f(p.r * g));
+    }));
+    intro.classList.toggle("titled", t >= T.title);
+    intro.classList.toggle("bright", t >= T.textDrops);
+    if (t >= T.done && !intro.classList.contains("done")) done();
+  }
+
+  /* ── 진행 ── (스크롤은 막지 않는다: 인트로 중에 내리면 인트로를 바로 마무리한다) */
+  intro.classList.add("paper", "fillpaper", "lit");
+  fig.style.setProperty("--cam", "1.3");
+  let start = performance.now() + 600, skipped = false, visible = true;
+  function frame(now) {
+    if (visible) render(skipped ? END : Math.max(0, now - start), now);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  new IntersectionObserver(es => visible = es[0].isIntersecting).observe(intro);
+  function done() { intro.classList.add("done"); document.body.classList.remove("locked"); hint.style.opacity = .8; stairs.classList.add("show"); }
+  document.getElementById("skip").addEventListener("click", e => { e.stopPropagation(); skipped = true; });
+  addEventListener("scroll", () => { if (scrollY > 30 && !intro.classList.contains("done")) skipped = true; }, { passive: true });
+  hint.style.opacity = .6; // 처음부터 아래로 내릴 수 있다는 걸 알려 둔다
+})();
+
+/* 검색: 숫자(또는 #7, No.7)는 작품 번호, 그 밖에는 제목·재료·연도·설명 */
+const workNo = w => WORKS.indexOf(w) + 1;
+function workMatch(w, t) {
+  t = String(t || "").trim().toLowerCase(); if (!t) return true;
+  const m = t.match(/^(?:#|no\.?\s*)?(\d{1,4})$/);
+  if (m && (/^(#|no)/.test(t) || t.length <= 3)) { if (workNo(w) === +m[1]) return true; if (/^(#|no)/.test(t)) return false; }
+  return [w.title, w.medium, w.year, w.desc].some(v => String(v || "").toLowerCase().includes(t));
+}
+
+/* ───────── 확대 보기 (FLIP) ───────── */
+const lb = (() => {
+  const box = document.getElementById("lightbox"), img = document.getElementById("lb-img");
+  const text = document.getElementById("lb-text"), title = document.getElementById("lb-title"), m = document.getElementById("lb-meta");
+  let from = null, origin = null;
+
+  function fit(nw, nh) {
+    const pad = innerWidth < 600 ? 20 : 60;
+    const room = Math.max(innerWidth < 600 ? 150 : 170, Math.ceil(text.offsetHeight) + 56);
+    const s = Math.min((innerWidth - pad * 2) / nw, (innerHeight - room - pad) / nh);
+    const w = nw * s, h = nh * s;
+    return { x: (innerWidth - w) / 2, y: Math.max(pad * .6, (innerHeight - room - h) / 2 + 10), w, h };
+  }
+  function place(r, base) { img.style.transform = `translate(${r.x}px, ${r.y}px) scale(${r.w / base.w}, ${r.h / base.h})`; }
+
+  let lbToken = 0;
+  function open(work, el) {
+    origin = el;
+    const srcImg = el.querySelector("img") || el;
+    const b = srcImg.getBoundingClientRect();
+    from = { x: b.left, y: b.top, w: b.width, h: b.height };
+    img.onload = null; img.src = work.web || work.src; img.alt = work.title; img.hidden = false;
+    if (work.web && work.web !== work.src) { // 원본은 뒤에서 불러와서 같은 자리에서 선명하게 바꾼다
+      const full = new Image(), mine = ++lbToken;
+      full.onload = () => { if (mine === lbToken && box.classList.contains("on")) img.src = work.src; };
+      full.src = work.src;
+    }
+    title.textContent = work.title; m.textContent = meta(work) || " ";
+    const go = () => {
+      const to = fit(img.naturalWidth, img.naturalHeight);
+      img.style.width = to.w + "px"; img.style.height = to.h + "px";
+      img.style.transition = "none"; place(from, to); img.getBoundingClientRect();
+      img.style.transition = ""; place(to, to);
+      img.dataset.w = to.w; img.dataset.h = to.h;
+    };
+    img.complete && img.naturalWidth ? go() : (img.onload = go);
+    title.textContent = work.title; m.textContent = meta(work) || " ";
+    box.classList.add("on"); box.setAttribute("aria-hidden", "false");
+    requestAnimationFrame(() => text.classList.add("show"));
+    document.body.classList.add("locked");
+    document.getElementById("lb-close").focus({ preventScroll: true });
+  }
+  function close() {
+    if (!box.classList.contains("on")) return;
+    text.classList.remove("show"); box.classList.remove("on"); box.setAttribute("aria-hidden", "true");
+    const b = (origin.querySelector("img") || origin).getBoundingClientRect();
+    place({ x: b.left, y: b.top, w: b.width, h: b.height }, { w: +img.dataset.w, h: +img.dataset.h });
+    setTimeout(() => { if (!box.classList.contains("on")) img.hidden = true; }, 650);
+    document.body.classList.remove("locked");
+    origin.focus({ preventScroll: true });
+  }
+  box.addEventListener("click", close);
+  addEventListener("keydown", e => e.key === "Escape" && close());
+  return { open };
+})();
+
+/* ───────── 카드 넘기기: 가운데 카드를 크게, 양옆은 비스듬히. 수백 점이어도 몇 장만 그려서 겹치지 않는다 ───────── */
+const cardFlow = (() => {
+  const view = gid("ring-view"), ring = gid("ring"), cap = gid("cf-cap"), range = gid("cf-range"), count = gid("cf-count");
+  const prev = gid("cf-prev"), next = gid("cf-next"), qEl = gid("cf-q");
+  const nodes = new Map(), KEEP = 6, VIS = 4;
+  let pos = 0, target = 0, cw = 220, step = 120, raf = 0, drag = null, dragged = false, touched = false, wheelAcc = 0, onScreen = false, auto = null;
+  const N = () => WORKS.length;
+  function layout() { const W = view.clientWidth || 600; cw = W < 600 ? Math.min(184, W * .56) : W < 1000 ? 200 : 230; step = cw * .56; view.style.setProperty("--cw", cw + "px"); }
+  function ensure(i) {
+    if (nodes.has(i)) return nodes.get(i);
+    const w = WORKS[i], c = document.createElement("button");
+    c.type = "button"; c.className = "card"; c.innerHTML = `<img src="${esc(w.web || w.src)}" alt="" draggable="false"><span>${esc(w.title)}</span>`;
+    c.setAttribute("aria-label", `${w.title}${i === target ? " 크게 보기" : " 가운데로 가져오기"}`);
+    c.addEventListener("click", () => { if (dragged) return; touched = true; if (i === target) lb.open(WORKS[i], c); else go(i); });
+    ring.appendChild(c); nodes.set(i, c); return c;
+  }
+  function draw() {
+    if (!N()) return;
+    const lo = Math.max(0, Math.floor(pos) - KEEP), hi = Math.min(N() - 1, Math.ceil(pos) + KEEP);
+    for (const [i, el] of nodes) if (i < lo || i > hi) { el.remove(); nodes.delete(i); }
+    for (let i = lo; i <= hi; i++) {
+      const d = i - pos, a = Math.abs(d), sd = Math.sign(d), el = ensure(i);
+      const x = sd * (Math.min(a, 1) * step * 1.4 + Math.max(0, a - 1) * step * .5);
+      el.style.transform = `translateX(${x.toFixed(1)}px) scale(${(1 - Math.min(a, 3) * .11).toFixed(3)}) perspective(900px) rotateY(${(-sd * Math.min(a, 1) * 46).toFixed(1)}deg)`;
+      el.style.zIndex = 100 - Math.round(a * 10);
+      el.style.opacity = a > VIS ? 0 : (1 - Math.max(0, a - 1) * .26).toFixed(2); el.style.pointerEvents = a > VIS ? "none" : "";
+      el.style.filter = a > 1 ? `blur(${Math.min(3, (a - 1) * 1.2).toFixed(1)}px)` : "";
+      el.style.setProperty("--io", (1 - Math.min(a, 2) * .16).toFixed(2)); el.style.setProperty("--sheen", (d * 40).toFixed(1) + "%");
+      el.tabIndex = i === target ? 0 : -1;
+    }
+  }
+  function ui() {
+    const w = WORKS[target]; if (!w) { cap.innerHTML = ""; count.textContent = ""; return; }
+    cap.innerHTML = `<em>No.${String(target + 1).padStart(2, "0")}</em><b>${esc(w.title)}</b>${meta(w) ? `<span>${esc(meta(w).replace(/\n[\s\S]*/, ""))}</span>` : ""}`;
+    count.textContent = `${target + 1} / ${N()}`; range.max = Math.max(0, N() - 1); range.value = target;
+    prev.disabled = target <= 0; next.disabled = target >= N() - 1;
+    nodes.forEach((el, i) => el.setAttribute("aria-label", `${WORKS[i].title}${i === target ? " 크게 보기" : " 가운데로 가져오기"}`));
+  }
+  function tick() { const diff = target - pos; if (Math.abs(diff) < .003) { pos = target; draw(); raf = 0; return; } pos += diff * (reduce ? 1 : .17); draw(); raf = requestAnimationFrame(tick); }
+  function go(i) { target = clampN(Math.round(i), 0, N() - 1); ui(); if (!raf) raf = requestAnimationFrame(tick); }
+  const stop = () => { touched = true; clearInterval(auto); auto = null; };
+  function startAuto() { if (reduce || auto || touched) return; auto = setInterval(() => { if (document.hidden || !onScreen || drag) return; go(target >= N() - 1 ? 0 : target + 1); }, 3800); }
+
+  view.addEventListener("pointerdown", e => { if (e.button) return; stop(); drag = { x: e.clientX, pos }; dragged = false; });
+  addEventListener("pointermove", e => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x; if (Math.abs(dx) > 6) { dragged = true; view.classList.add("grabbing"); }
+    if (!dragged) return;
+    pos = clampN(drag.pos - dx / (step * 1.4), 0, N() - 1); target = Math.round(pos); ui(); draw();
+  });
+  addEventListener("pointerup", () => { if (!drag) return; drag = null; view.classList.remove("grabbing"); if (dragged) { go(pos); setTimeout(() => dragged = false, 60); } });
+  view.addEventListener("wheel", e => { if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return; e.preventDefault(); stop(); wheelAcc += e.deltaX; if (Math.abs(wheelAcc) > 70) { go(target + Math.sign(wheelAcc)); wheelAcc = 0; } }, { passive: false });
+  view.addEventListener("keydown", e => { const k = { ArrowLeft: -1, ArrowRight: 1 }[e.key]; if (k) { e.preventDefault(); stop(); go(target + k); } else if (e.key === "Home") go(0); else if (e.key === "End") go(N() - 1); });
+  prev.addEventListener("click", () => { stop(); go(target - 1); }); next.addEventListener("click", () => { stop(); go(target + 1); });
+  range.addEventListener("input", () => { stop(); go(+range.value); });
+  qEl.addEventListener("input", () => { const t = qEl.value.trim().toLowerCase(); if (!t) return; stop(); const i = WORKS.findIndex(w => workMatch(w, t)); if (i >= 0) go(i); });
+  addEventListener("resize", () => { layout(); draw(); });
+  if ("IntersectionObserver" in window) new IntersectionObserver(es => { onScreen = es[0].isIntersecting; if (onScreen) startAuto(); }).observe(view); else onScreen = true;
+  function render() { layout(); nodes.forEach(el => el.remove()); nodes.clear(); target = clampN(target, 0, Math.max(0, N() - 1)); pos = target; ui(); draw(); }
+  onWorks(render);
+  return { render };
+})();
+
+/* ───────── 우표첩: 한 장에 몇 장씩 붙이고, 한 장씩 넘긴다. 수백 점이면 장 수만 늘어난다 ───────── */
+const album = (() => {
+  const grid = gid("alb-grid"), no = gid("alb-no"), range = gid("alb-range"), count = gid("alb-count"), sheet = grid.parentElement;
+  const prev = gid("alb-prev"), next = gid("alb-next"), qEl = gid("alb-q");
+  let page = 0, cols = 4, per = 12;
+  const pages = () => Math.max(1, Math.ceil(WORKS.length / per));
+  function setCols() { const W = sheet.clientWidth || 800; cols = W < 440 ? 2 : W < 760 ? 3 : 4; per = cols * 3; }
+  function show(p, dir) {
+    setCols(); const total = pages(); page = clampN(p, 0, total - 1);
+    const part = WORKS.slice(page * per, page * per + per);
+    grid.style.setProperty("--cols", cols);
+    grid.innerHTML = part.map((w, k) => { const i = page * per + k;
+      return `<button class="alb-stamp" type="button" data-i="${i}" aria-label="${esc(w.title)} 크게 보기" style="--rot:${((seededN(i) - .5) * 6).toFixed(1)}deg;--dy:${((seededN(i + 5) - .5) * 10).toFixed(0)}px">
+        <span class="stamp-paper"><img src="${esc(w.web || w.src)}" alt="" loading="lazy" draggable="false"><b><em>${esc(w.title)}</em><small>${String(i + 1).padStart(2, "0")}</small></b></span>${i % 5 === 0 ? `<span class="postmark">PARRANII<br>2026</span>` : ""}</button>`; }).join("")
+      || `<p class="alb-empty">아직 붙여 둔 우표가 없어요.</p>`;
+    no.textContent = `— ${page + 1} —`; count.textContent = `${page + 1} / ${total} 장`;
+    range.max = total - 1; range.value = page; prev.disabled = page <= 0; next.disabled = page >= total - 1;
+    if (dir && !reduce && grid.animate) grid.animate([{ opacity: 0, transform: `translateX(${dir * 60}px) rotate(${dir * 1.4}deg)` }, { opacity: 1, transform: "none" }], { duration: 480, easing: "cubic-bezier(.2,.7,.2,1)" });
+  }
+  grid.addEventListener("click", e => { const b = e.target.closest(".alb-stamp"); if (b) lb.open(WORKS[+b.dataset.i], b); });
+  prev.addEventListener("click", () => show(page - 1, -1)); next.addEventListener("click", () => show(page + 1, 1));
+  range.addEventListener("input", () => { const p = +range.value; show(p, p > page ? 1 : -1); });
+  qEl.addEventListener("input", () => { const t = qEl.value.trim().toLowerCase(); if (!t) return; const i = WORKS.findIndex(w => workMatch(w, t)); if (i >= 0) show(Math.floor(i / per), Math.floor(i / per) > page ? 1 : -1); });
+  gid("album").addEventListener("keydown", e => { if (/INPUT/.test(document.activeElement.tagName)) return; if (e.key === "ArrowRight") show(page + 1, 1); else if (e.key === "ArrowLeft") show(page - 1, -1); });
+  let lastCols = 0; addEventListener("resize", () => { if (gid("album").hidden) return; const before = cols; setCols(); if (cols !== before) show(Math.floor(page * (before * 3) / per)); });
+  onWorks(() => { if (!gid("album").hidden) show(page); });
+  return { show: () => show(page) };
+})();
+
+/* ───────── 보기 방식 ───────── */
+(() => {
+  const btns = { ring: gid("mode-ring"), stamp: gid("mode-stamp") };
+  const panes = { ring: gid("ring-wrap"), stamp: gid("album") }, help = gid("browse-help");
+  const HELP = {
+    ring: "가운데 카드가 지금 보는 작품이에요. 끌거나 화살표로 넘기고, 가운데 카드를 눌러 크게 보세요.",
+    stamp: "우표첩을 한 장씩 넘겨 보세요. 한 장에 몇 점씩만 붙어 있고, 누르면 크게 볼 수 있어요.",
+  };
+  let chosen = false;
+  function mode(m, byUser) {
+    if (byUser) chosen = true;
+    Object.entries(btns).forEach(([k, b]) => b.setAttribute("aria-pressed", k === m));
+    Object.entries(panes).forEach(([k, p]) => p.hidden = k !== m);
+    help.textContent = HELP[m];
+    if (m === "ring") cardFlow.render(); else album.show();
+  }
+  Object.entries(btns).forEach(([k, b]) => b.addEventListener("click", () => mode(k, true)));
+  onWorks(() => { if (!chosen) mode("ring"); });
+})();
+
+/* ───────── 전시실: ALL · 연도 · 재료로 좁히고, 정렬하고, 열 점씩 이어서 본다 ───────── */
+(() => {
+  const list = gid("works"), more = gid("xf-more"), count = gid("xf-count"), sortEl = gid("xf-sort"), allBtn = gid("xf-all");
+  const rows = { year: gid("xf-year"), medium: gid("xf-medium") };
+  const flt = { year: "", medium: "" }, qx = gid("xf-q");
+  let view = "grid";
+  const PAGE = () => view === "grid" ? (isNarrow() ? 16 : 30) : (isNarrow() ? 6 : 10);
+  let shown = PAGE(), drawn = 0, current = [];
+  const io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add("seen")), { threshold: .2 });
+
+  /* 재료 묶기: 바탕(종이·캔버스·나무·한지…)은 떼고, 쓴 재료로 묶는다. 캔버스에 과슈·나무에 과슈·아크릴과슈는 모두 ‘과슈’ */
+  const SURFACE = /^(종이|캔버스|나무|패널|판넬|합판|천|린넨|광목|벽|한지|장지|화선지|비단|유리|보드|아트지|켄트지|돌|철판)\s*(에|위에|에다)\s*/;
+  const MATERIALS = [
+    [/과슈|gouache/i, "과슈"], [/오일\s*파스텔|oil\s*pastel/i, "오일파스텔"], [/수채|water\s*colou?r/i, "수채"], [/아크릴|acrylic/i, "아크릴"],
+    [/유화|oil\s*(paint|on)/i, "유화"], [/파스텔|pastel/i, "파스텔"], [/색연필/, "색연필"], [/목탄|연필|드로잉|charcoal|pencil/i, "연필·목탄"],
+    [/잉크|펜|ink\b|pen\b/i, "잉크·펜"], [/수묵|먹/, "먹"], [/마커|marker/i, "마커"], [/자개/, "자개"], [/콜라주|collage/i, "콜라주"], [/채색/, "채색"],
+  ];
+  const materialCache = new Map();
+  function mediaTokens(v) {
+    const raw = String(v || ""); if (materialCache.has(raw)) return materialCache.get(raw);
+    const out = new Set();
+    raw.split(/[,，·/+&]|\s및\s/).map(x => x.trim()).filter(Boolean).forEach(t => {
+      const rest = t.replace(SURFACE, "").trim() || t;
+      const hit = MATERIALS.find(([re]) => re.test(rest)); out.add(hit ? hit[1] : rest);
+    });
+    if (out.size > 1) out.delete("채색");           // ‘채색’만 적힌 작품 말고는, 더 구체적인 재료가 있으면 그쪽으로
+    const arr = [...out]; materialCache.set(raw, arr); return arr;
+  }
+  const NONE = "__none";
+  function chip(g, v, label, n, swatch) { return `<button class="xf-chip" type="button" data-g="${g}" data-v="${esc(v)}" aria-pressed="${flt[g] === v}">${swatch ? `<i style="background:${swatch}"></i>` : ""}${esc(label)}<small>${n}</small></button>`; }
+  function buildChips() {
+    const years = {}, media = {}; let noYear = 0;
+    WORKS.forEach(w => { const y = String(w.year || "").trim(); y ? years[y] = (years[y] || 0) + 1 : noYear++; mediaTokens(w.medium).forEach(m => media[m] = (media[m] || 0) + 1); });
+    rows.year.innerHTML = Object.keys(years).sort().reverse().map(y => chip("year", y, y, years[y])).join("") + (noYear ? chip("year", NONE, "연도 없음", noYear) : "") || `<span class="xf-note">연도가 적힌 작품이 아직 없어요</span>`;
+    rows.medium.innerHTML = Object.entries(media).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "ko")).map(([m, n]) => chip("medium", m, m, n)).join("") || `<span class="xf-note">재료가 적힌 작품이 아직 없어요</span>`;
+    allBtn.setAttribute("aria-pressed", !flt.year && !flt.medium && !qx.value.trim());
+    const act = gid("xf-active"), tags = [];
+    if (flt.year) tags.push(["year", "연도", flt.year === NONE ? "연도 없음" : flt.year, ""]);
+    if (flt.medium) tags.push(["medium", "재료", flt.medium, ""]);
+    act.hidden = !tags.length;
+    act.innerHTML = tags.length ? `<b>선택한 조건</b>` + tags.map(([g, lab, val, hex]) => `<button class="xf-tag" type="button" data-g="${g}" aria-label="${lab} ${esc(val)} 조건 지우기"><em>${lab}</em>${hex ? `<i style="background:${hex}"></i>` : ""}${esc(val)}<span aria-hidden="true">×</span></button>`).join("") + (tags.length > 1 ? `<button class="xf-clear" type="button" id="xf-clear">모두 지우기</button>` : "") : "";
+  }
+  const yearNum = w => +String(w.year || "").match(/\d{4}/) || 0;
+  function filtered() {
+    const idx = new Map(WORKS.map((w, i) => [w, i]));
+    let l = WORKS.filter(w =>
+      (!flt.year || (flt.year === NONE ? !String(w.year || "").trim() : String(w.year || "").trim() === flt.year)) &&
+      (!flt.medium || mediaTokens(w.medium).includes(flt.medium)) && workMatch(w, qx.value));
+    const by = {
+      order: (a, b) => idx.get(a) - idx.get(b),
+      "year-desc": (a, b) => (yearNum(b) - yearNum(a)) || idx.get(a) - idx.get(b),
+      "year-asc": (a, b) => ((yearNum(a) || 9999) - (yearNum(b) || 9999)) || idx.get(a) - idx.get(b),
+      medium: (a, b) => String(mediaTokens(a.medium)[0] || "힣").localeCompare(String(mediaTokens(b.medium)[0] || "힣"), "ko") || idx.get(a) - idx.get(b),
+      title: (a, b) => String(a.title).localeCompare(String(b.title), "ko"),
+    }[sortEl.value];
+    return by ? l.sort(by) : l;
+  }
+  function gitem(w) {
+    const a = document.createElement("article"); a.className = "gitem";
+    a.innerHTML = `<figure><img src="${esc(w.web || w.src)}" alt="${esc(w.title)}" loading="lazy" decoding="async"></figure><p><span class="no">No. ${String(workNo(w)).padStart(2, "0")}</span>${esc(w.title)}</p>`;
+    a.querySelector("figure").addEventListener("click", () => lb.open(w, a.querySelector("figure")));
+    return a;
+  }
+  function item(w) {
+    if (view === "grid") return gitem(w);
+    const a = document.createElement("article"); a.className = "work";
+    a.innerHTML = `<figure><img src="${esc(w.web || w.src)}" alt="${esc(w.title)}" loading="lazy"></figure>
+      <div class="cap"><span class="no">No. ${String(workNo(w)).padStart(2, "0")}</span><h3>${esc(w.title)}</h3><dl>
+        ${w.size ? `<dt>크기</dt><dd>${esc(w.size)}</dd>` : ""}
+        ${w.medium ? `<dt>재료</dt><dd>${esc(w.medium)}</dd>` : ""}
+        ${w.year ? `<dt>연도</dt><dd>${esc(w.year)}</dd>` : ""}
+      </dl></div>${w.desc ? `<p class="desc">${esc(w.desc)}</p>` : ""}`;
+    a.querySelector("figure").addEventListener("click", () => lb.open(w, a.querySelector("figure")));
+    io.observe(a); return a;
+  }
+  function render(append) {
+    const part = current.slice(0, shown);
+    if (!append) { list.innerHTML = ""; drawn = 0; }
+    if (!current.length) list.innerHTML = `<p class="xf-empty">${WORKS.length ? "조건에 맞는 작품이 없어요. ‘ALL’을 눌러 처음으로 돌아가 보세요." : "아직 전시된 작품이 없어요."}</p>`;
+    else { if (!drawn) list.innerHTML = ""; part.slice(drawn).forEach(w => list.appendChild(item(w))); drawn = part.length; }
+    const f = flt.year || flt.medium || qx.value.trim();
+    count.innerHTML = `총 <b>${WORKS.length}</b>점` + (f ? ` · 조건에 맞는 작품 ${current.length}점` : "") + (current.length > part.length ? ` · ${part.length}점 보는 중` : "");
+    list.classList.toggle("grid", view === "grid");
+    more.hidden = !!sentIO || current.length <= part.length; if (sentIO) { sentIO.unobserve(sent); sentIO.observe(sent); } more.textContent = `다음 ${Math.min(PAGE(), current.length - part.length)}점 더 보기 (남은 ${current.length - part.length}점)`;
+  }
+  function applyAndRender() { current = filtered(); shown = Math.max(shown, PAGE()); render(false); }
+  function reset() { shown = PAGE(); current = filtered(); render(false); }
+  gid("xf").addEventListener("click", e => {
+    const b = e.target.closest(".xf-chip"); if (!b) return;
+    const g = b.dataset.g; flt[g] = flt[g] === b.dataset.v ? "" : b.dataset.v;
+    buildChips(); reset();
+  });
+  const clearAll = () => { flt.year = flt.medium = ""; qx.value = ""; buildChips(); reset(); };
+  allBtn.addEventListener("click", clearAll);
+  gid("xf-active").addEventListener("click", e => {
+    if (e.target.closest("#xf-clear")) return clearAll();
+    const t = e.target.closest(".xf-tag"); if (!t) return;
+    flt[t.dataset.g] = ""; buildChips(); reset();
+  });
+  sortEl.addEventListener("change", reset);
+  let qt; qx.addEventListener("input", () => { clearTimeout(qt); qt = setTimeout(() => { buildChips(); reset(); }, 200); });
+  more.addEventListener("click", () => { shown += PAGE(); current = filtered(); render(true); });
+  // 바닥 근처에 오면 다음 작품을 자동으로 이어 붙인다
+  const sent = gid("xf-sentinel");
+  const sentIO = "IntersectionObserver" in window ? new IntersectionObserver(es => {
+    if (es[0].isIntersecting && drawn && current.length > shown) { shown += PAGE(); render(true); }
+  }, { rootMargin: "900px 0px" }) : null;
+  gid("xf").addEventListener("click", e => {
+    const b = e.target.closest("[data-view]"); if (!b || b.dataset.view === view) return;
+    view = b.dataset.view; gid("xf").querySelectorAll("[data-view]").forEach(x => x.setAttribute("aria-pressed", x === b));
+    const y = list.getBoundingClientRect().top + scrollY; reset();
+    if (scrollY > y) scrollTo(0, y - 80);
+  });
+  onWorks(() => { buildChips(); reset(); });
+})();
+
+/* ───────── 관리자 페이지: #admin 에서 작품 사진·캡션을 고친다 (소유자·편집자만) ───────── */
+(() => {
+  const sec = document.getElementById("admin"), listEl = document.getElementById("adm-list"), note = document.getElementById("adm-note");
+  const addBtn = document.getElementById("adm-add"), link = document.getElementById("admin-link");
+  let db = null, assets = null, canEdit = false, docs = [], unsub = null, ready = null;
+  const bar = document.getElementById("adm-bar"), countEl = document.getElementById("adm-count"), hint = document.getElementById("adm-hint");
+  const q = document.getElementById("adm-q"), fMedium = document.getElementById("adm-medium"), fYear = document.getElementById("adm-year");
+  const fPhoto = document.getElementById("adm-photo"), fSort = document.getElementById("adm-sort");
+  [q, fMedium, fYear, fPhoto, fSort].forEach(el => el.addEventListener(el === q ? "input" : "change", render));
+  document.getElementById("adm-reset").addEventListener("click", () => { q.value = ""; fMedium.value = fYear.value = fPhoto.value = ""; fSort.value = "order"; render(); });
+  // 크기 "53×45.5cm" → 면적, 재료 "한지에 채색, 자개" → ["한지에 채색", "자개"]
+  const area = v => { const n = String(v || "").match(/[\d.]+/g); return n && n.length >= 2 ? +n[0] * +n[1] : n ? +n[0] : -1; };
+  const media = v => String(v || "").split(/[,·]/).map(x => x.trim()).filter(Boolean);
+  function fillSelect(sel, values) {
+    const cur = sel.value;
+    sel.innerHTML = `<option value="">전체</option>` + values.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join("");
+    sel.value = values.includes(cur) ? cur : "";
+  }
+  function visibleDocs() {
+    const term = q.value.trim().toLowerCase();
+    let list = docs.map((d, i) => ({ d, i, w: d.data() }));
+    list = list.filter(({ w }) =>
+      (!term || [w.title, w.medium, w.desc, w.size, w.year].some(v => String(v || "").toLowerCase().includes(term))) &&
+      (!fMedium.value || media(w.medium).includes(fMedium.value)) &&
+      (!fYear.value || String(w.year || "") === fYear.value) &&
+      (!fPhoto.value || (fPhoto.value === "yes") === !!imgSrc(w)));
+    const by = {
+      title: (a, b) => String(a.w.title || "").localeCompare(String(b.w.title || ""), "ko"),
+      "year-desc": (a, b) => (+b.w.year || 0) - (+a.w.year || 0) || a.i - b.i,
+      "year-asc": (a, b) => (+a.w.year || 9999) - (+b.w.year || 9999) || a.i - b.i,
+      "size-desc": (a, b) => area(b.w.size) - area(a.w.size),
+      "size-asc": (a, b) => (area(a.w.size) < 0 ? 1e9 : area(a.w.size)) - (area(b.w.size) < 0 ? 1e9 : area(b.w.size)),
+      recent: (a, b) => String(b.w.createdAt || "").localeCompare(String(a.w.createdAt || "")) || b.i - a.i,
+    }[fSort.value];
+    if (by) list.sort(by);
+    return list;
+  }
+  const FIELDS = [["title", "제목", "full"], ["size", "크기", ""], ["medium", "재료", ""], ["year", "연도", ""], ["desc", "설명 (선택)", "full", true]];
+
+  async function init() {
+    if (ready) return ready;
+    ready = (async () => {
+      db = await DB;
+      const user = await window.claude?.use?.("user");
+      canEdit = !!(user && await user.canEdit());
+      assets = canEdit ? await window.claude.use("assets") : null;
+      link.hidden = !canEdit;
+    })();
+    return ready;
+  }
+  init();
+
+  function route() {
+    const on = location.hash === "#admin";
+    document.body.classList.toggle("admin", on);
+    sec.hidden = !on;
+    if (on) { scrollTo(0, 0); open(); }
+  }
+  addEventListener("hashchange", route);
+
+  // 긴 변 1200px의 작은 JPEG를 만든다 (방문자 화면이 원본을 내려받지 않도록)
+  function makeWebBlob(file) {
+    return new Promise(res => {
+      const u = URL.createObjectURL(file), im = new Image();
+      im.onload = () => {
+        try {
+          const k = Math.min(1, 1200 / Math.max(im.naturalWidth, im.naturalHeight)), c = document.createElement("canvas");
+          c.width = Math.round(im.naturalWidth * k); c.height = Math.round(im.naturalHeight * k);
+          c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+          c.toBlob(b => { URL.revokeObjectURL(u); res(b); }, "image/jpeg", .82);
+        } catch { URL.revokeObjectURL(u); res(null); }
+      };
+      im.onerror = () => { URL.revokeObjectURL(u); res(null); }; im.src = u;
+    });
+  }
+  async function open() {
+    note.hidden = false; note.textContent = "불러오는 중…";
+    await init();
+    if (!db) { note.textContent = "이 화면에서는 작품 데이터를 불러올 수 없어요. claude.ai에서 로그인한 상태로 열어 주세요."; return; }
+    if (!canEdit) { note.textContent = "작품 관리는 이 갤러리의 소유자와 편집자만 할 수 있어요."; listEl.innerHTML = ""; addBtn.hidden = true; return; }
+    addBtn.hidden = false;
+    if (!unsub) unsub = db.collection("works").orderBy("order").onSnapshot(snap => { docs = snap.docs; render(); },
+      () => { note.hidden = false; note.textContent = "작품 목록을 불러오지 못했어요. 잠시 뒤 새로고침해 주세요."; });
+  }
+
+  const status = (row, text, err) => { const s = row.querySelector(".adm-status"); s.textContent = text; s.classList.toggle("err", !!err); };
+  const saving = new Map(); // 문서별로 한 번에 하나씩 저장
+  function save(id, row, patch) {
+    const prev = saving.get(id) || Promise.resolve();
+    const next = prev.then(async () => {
+      status(row, "저장 중…");
+      try { await db.collection("works").doc(id).update(patch); status(row, "저장됨"); }
+      catch (e) { status(row, "저장하지 못했어요. 다시 시도해 주세요.", true); }
+    });
+    saving.set(id, next); return next;
+  }
+
+  // 로그인하지 않은 방문자가 보는 공개용 목록(SNAPSHOT)과 지금 저장된 목록을 견주어, 아직 공개 쪽에 반영되지 않은 변경을 알려 준다
+  const sig = w => [w.title, w.size, w.medium, w.year, w.desc || "", w.image || "", w.order, w.hidden ? 1 : 0].join("\u0001");
+  function syncNotice() {
+    const box = gid("adm-sync"); if (!docs.length) { box.hidden = true; return; }
+    const pub = new Map(SNAPSHOT.map(w => [w.id, sig(w)])), live = new Map(docs.map(d => [d.id, sig(d.data())]));
+    let changed = 0, added = 0, removed = 0;
+    live.forEach((v, id) => { if (!pub.has(id)) added++; else if (pub.get(id) !== v) changed++; });
+    pub.forEach((v, id) => { if (!live.has(id)) removed++; });
+    const n = changed + added + removed; box.hidden = false; box.classList.toggle("warn", n > 0);
+    box.innerHTML = n ? `<b>공개 페이지에 아직 반영되지 않은 변경이 ${n}건 있어요</b> (수정 ${changed} · 추가 ${added} · 삭제 ${removed}).<br>인스타그램 링크처럼 로그인하지 않고 보는 사람에게는 마지막으로 ‘공개 반영’한 목록(${SNAPSHOT.length}점)이 보여요. Claude에게 <b>“공개 페이지에 반영해줘”</b>라고 말하면 지금 저장된 내용으로 바꿔 드려요.`
+      : `공개 페이지와 같은 내용이에요. 로그인하지 않고 보는 사람에게도 지금 목록 ${SNAPSHOT.length}점이 그대로 보여요.`;
+  }
+  let renderLater = false;
+  listEl.addEventListener("focusout", () => setTimeout(() => {
+    if (renderLater && !(document.activeElement && listEl.contains(document.activeElement) && /^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName))) render();
+  }, 0));
+  const grow = t => { t.style.height = "auto"; t.style.height = Math.min(t.scrollHeight + 2, 420) + "px"; };
+  function render() {
+    syncNotice();
+    // 입력 중(특히 천지인·한글 조합 중)에는 목록을 다시 만들지 않는다 — 입력칸이 바뀌면 자모가 조합되지 못하고 따로 찍힌다
+    const focused = document.activeElement && listEl.contains(document.activeElement) && /^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName) && document.activeElement.type !== "file" ? document.activeElement : null;
+    if (focused) { renderLater = true; return; }
+    renderLater = false;
+    const keep = null;
+    fillSelect(fMedium, [...new Set(docs.flatMap(d => media(d.data().medium)))].sort((a, b) => a.localeCompare(b, "ko")));
+    fillSelect(fYear, [...new Set(docs.map(d => String(d.data().year || "")).filter(Boolean))].sort().reverse());
+    const shown = visibleDocs(), filtered = shown.length !== docs.length, canMove = fSort.value === "order" && !filtered;
+    bar.hidden = !docs.length;
+    const withPhoto = docs.filter(d => imgSrc(d.data())).length;
+    countEl.innerHTML = `총 <b>${docs.length}</b>점` + (filtered ? `<span>조건에 맞는 작품 ${shown.length}점</span>` : "") +
+      (withPhoto < docs.length ? `<span>사진 없는 작품 ${docs.length - withPhoto}점</span>` : "");
+    hint.hidden = canMove || !docs.length;
+    note.hidden = shown.length > 0;
+    note.textContent = docs.length ? "조건에 맞는 작품이 없어요. 필터를 바꾸거나 ‘초기화’를 눌러 주세요." : "아직 등록된 작품이 없어요. ‘새 작품 추가’로 첫 작품을 올려 보세요.";
+    listEl.innerHTML = "";
+    shown.forEach(({ d, i }) => {
+      const w = d.data(), src = webSrc(d.id, w);
+      const row = document.createElement("article");
+      row.className = "adm-item"; row.dataset.id = d.id;
+      row.innerHTML = `
+        <div class="adm-thumb">
+          <div class="ph">${src ? "" : "사진 없음"}</div>
+          <label class="btn quiet" for="file-${d.id}">사진 바꾸기</label>
+          <input type="file" id="file-${d.id}" accept="image/png,image/jpeg,image/webp,image/gif">
+        </div>
+        <div class="adm-fields">
+          ${FIELDS.map(([k, label, cls, area]) => `<label class="${cls}">${label}${area
+            ? `<textarea name="${k}" id="${k}-${d.id}"></textarea>`
+            : `<input name="${k}" id="${k}-${d.id}" type="text">`}</label>`).join("")}
+          <div class="adm-row">
+            <div class="left">
+              <span class="adm-num">${String(i + 1).padStart(2, "0")}</span>
+              <button class="btn quiet" type="button" data-move="-1" ${!canMove || i === 0 ? "disabled" : ""} aria-label="앞으로">↑</button>
+              <button class="btn quiet" type="button" data-move="1" ${!canMove || i === docs.length - 1 ? "disabled" : ""} aria-label="뒤로">↓</button>
+              <span class="adm-status"></span>
+            </div>
+            <div class="right"><button class="btn danger" type="button" data-del>삭제</button></div>
+          </div>
+        </div>`;
+      if (src) row.querySelector(".ph").style.backgroundImage = `url("${src.replace(/"/g, "%22")}")`;
+      FIELDS.forEach(([k]) => {
+        const el = row.querySelector(`[name=${k}]`);
+        el.value = w[k] ?? "";
+        let timer, composing = false;
+        const commit = () => { clearTimeout(timer); if (el.value !== (w[k] ?? "")) { w[k] = el.value; save(d.id, row, { [k]: el.value }); } };
+        el.addEventListener("compositionstart", () => { composing = true; clearTimeout(timer); });
+        el.addEventListener("compositionend", () => { composing = false; clearTimeout(timer); timer = setTimeout(commit, 900); });
+        el.addEventListener("input", e => {
+          if (el.tagName === "TEXTAREA") grow(el);
+          clearTimeout(timer); status(row, "입력 중…");
+          if (composing || e.isComposing) return; // 조합이 끝난 뒤에 저장
+          timer = setTimeout(commit, 900);
+        });
+        el.addEventListener("blur", () => { if (!composing) commit(); });
+      });
+      // 사진 바꾸기
+      row.querySelector("input[type=file]").addEventListener("change", async e => {
+        const file = e.target.files[0]; if (!file) return;
+        if (!assets) { status(row, "이 화면에서는 사진을 올릴 수 없어요.", true); return; }
+        status(row, "사진 올리는 중…");
+        try {
+          const up = await assets.upload(file);
+          const old = w.image;
+          const webBlob = await makeWebBlob(file); let webUp = null;
+          if (webBlob) { try { webUp = await assets.upload(webBlob, { type: "image/jpeg" }); } catch {} }
+          await save(d.id, row, { image: up.id, webId: webUp ? webUp.id : "" });
+          if (w.webId && (!webUp || w.webId !== webUp.id)) assets.delete(w.webId).catch(() => {});
+          if (old && old !== up.id) assets.delete(old).catch(() => {}); // 이전 사진은 이 작품만 쓰던 것
+        } catch (err) {
+          const msg = { too_large: "사진이 너무 커요 (20MB 이하).", unsupported_type: "JPG, PNG, WEBP, GIF 사진만 올릴 수 있어요." }[err?.code] || "사진을 올리지 못했어요. 다시 시도해 주세요.";
+          status(row, msg, true);
+        }
+      });
+      // 순서 바꾸기
+      row.querySelectorAll("[data-move]").forEach(b => b.addEventListener("click", async () => {
+        const j = i + +b.dataset.move, other = docs[j]; if (!other) return;
+        const a = w.order ?? i, c = other.data().order ?? j;
+        status(row, "순서 바꾸는 중…");
+        try {
+          await db.collection("works").doc(d.id).update({ order: c === a ? j : c });
+          await db.collection("works").doc(other.id).update({ order: c === a ? i : a });
+        } catch { status(row, "순서를 바꾸지 못했어요.", true); }
+      }));
+      // 삭제 (한 번 더 확인)
+      const del = row.querySelector("[data-del]");
+      del.addEventListener("click", () => {
+        const box = del.parentElement;
+        box.innerHTML = `<span class="adm-confirm">이 작품을 지울까요? <button class="btn danger" type="button" data-yes>지우기</button><button class="btn quiet" type="button" data-no>취소</button></span>`;
+        box.querySelector("[data-no]").addEventListener("click", render);
+        box.querySelector("[data-yes]").addEventListener("click", async () => {
+          try {
+            await db.collection("works").doc(d.id).delete();
+            if (assets) { if (w.image) assets.delete(w.image).catch(() => {}); if (w.webId) assets.delete(w.webId).catch(() => {}); }
+          } catch { status(row, "지우지 못했어요. 다시 시도해 주세요.", true); }
+        });
+      });
+      listEl.appendChild(row);
+      grow(row.querySelector("textarea"));
+    });
+  }
+
+  addBtn.addEventListener("click", async () => {
+    const order = docs.reduce((m, d) => Math.max(m, d.data().order ?? 0), 0) + 1;
+    addBtn.disabled = true;
+    try {
+      q.value = ""; fMedium.value = fYear.value = fPhoto.value = ""; // 새 작품이 바로 보이도록
+      const ref = await db.collection("works").add({ title: "새 작품", size: "", medium: "", year: "", desc: "", order, createdAt: new Date().toISOString() });
+      setTimeout(() => { const el = document.getElementById("title-" + ref.id); if (el) { el.focus(); el.select(); } }, 300);
+    } catch (e) {
+      note.hidden = false; note.textContent = e?.code === "quota_exceeded" ? "저장 공간이 가득 찼어요. 쓰지 않는 작품을 지운 뒤 다시 시도해 주세요." : "작품을 추가하지 못했어요. 다시 시도해 주세요.";
+    } finally { addBtn.disabled = false; }
+  });
+
+  route();
+})();
+
+/* ───────── 계단과 아이 ───────── */
+(() => {
+  const wrap = document.getElementById("stairs"), svg = document.getElementById("steps"), walker = document.getElementById("walker");
+  const PER = 4;           // 한 층계참당 계단 수
+  let N, pts = [], cur = 0, target = 0, timer = null, facing = 1;
+
+  function build() {
+    if (!wrap.clientWidth) return; // 모바일에서는 하단 바를 쓴다
+    const W = wrap.clientWidth, H = wrap.clientHeight, small = W < 80;
+    N = small ? 12 : 16;
+    const run = (W - 8) / PER, rise = H / N;
+    let d = "", x = 4, y = 0, dir = 1;
+    pts = [];
+    d = `M${x} ${y}`;
+    for (let k = 0; k <= N; k++) {
+      pts.push({ x: x + dir * run / 2, y, dir });
+      if (k === N) { d += ` L${x + dir * run} ${y}`; break; }
+      const nx = x + dir * run; d += ` L${nx} ${y} L${nx} ${y + rise}`;
+      x = nx; y += rise;
+      if ((k + 1) % PER === 0) dir = -dir; // 층계참에서 방향을 바꾼다
+    }
+    svg.innerHTML = `<path d="${d}"/>`;
+    wrap.querySelectorAll(".hit").forEach(h => h.remove());
+    pts.forEach((p, k) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "hit";
+      b.style.left = (p.x - run / 2 - (p.dir < 0 ? 0 : 0)) + "px"; b.style.width = run + "px"; b.style.top = (p.y - 20) + "px";
+      b.setAttribute("aria-label", `${Math.round(k / N * 100)}% 위치로 이동`);
+      b.addEventListener("click", () => scrollTo({ top: k / N * (document.documentElement.scrollHeight - innerHeight), behavior: "smooth" }));
+      wrap.appendChild(b);
+    });
+    place(true);
+  }
+  function place(instant) {
+    if (!pts.length) return;
+    const p = pts[cur], ww = walker.offsetWidth, wh = walker.offsetHeight;
+    walker.style.transition = instant ? "none" : "";
+    walker.style.transform = `translate(${p.x - ww / 2}px, ${p.y - wh}px) scaleX(${facing})`;
+  }
+  function step() {
+    if (cur === target) { walker.classList.remove("walking"); timer = null; return; }
+    const down = target > cur;
+    const from = pts[cur];
+    cur += down ? 1 : -1;
+    // 내려갈 때는 그 층의 진행 방향, 오를 때는 반대 방향을 바라본다
+    const dir = down ? from.dir : pts[cur].dir;
+    facing = down ? dir : -dir;
+    place(false);
+    timer = setTimeout(step, reduce ? 0 : 230);
+  }
+  function update() {
+    if (!pts.length) return;
+    const max = document.documentElement.scrollHeight - innerHeight;
+    target = Math.round(Math.min(1, Math.max(0, scrollY / (max || 1))) * N);
+    if (!timer && target !== cur) { walker.classList.add("walking"); step(); }
+  }
+  build();
+  addEventListener("resize", () => { build(); update(); });
+  addEventListener("scroll", update, { passive: true });
+  update();
+})();
+/* ───────── 모바일 하단 바: 바로가기 + 읽은 위치 표시 ───────── */
+(() => {
+  const dock = document.getElementById("dock"), bar = document.getElementById("dock-bar"), stairs = document.getElementById("stairs");
+  function update() {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    bar.style.transform = `scaleX(${Math.min(1, Math.max(0, scrollY / (max || 1)))})`;
+    let cur = "";
+    ["browse", "room"].forEach(id => { const e = document.getElementById(id); if (e && e.getBoundingClientRect().top < innerHeight * .5) cur = id; });
+    dock.querySelectorAll("[data-to]").forEach(b => b.setAttribute("aria-current", b.dataset.to === cur));
+  }
+  dock.querySelector(".dock-nav").addEventListener("click", e => {
+    const b = e.target.closest("[data-to]"); if (!b) return;
+    const to = b.dataset.to === "top" ? 0 : document.getElementById(b.dataset.to).getBoundingClientRect().top + scrollY - 8;
+    scrollTo({ top: to, behavior: reduce ? "auto" : "smooth" });
+  });
+  const sync = () => dock.classList.toggle("show", stairs.classList.contains("show"));
+  new MutationObserver(sync).observe(stairs, { attributes: true, attributeFilter: ["class"] }); sync();
+  addEventListener("scroll", update, { passive: true }); addEventListener("resize", update); update();
+})();
+</script>

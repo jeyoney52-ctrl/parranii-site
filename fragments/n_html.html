@@ -1,0 +1,106 @@
+<a class="brand home-link" href="./" aria-label="gallery parranii 처음 화면으로 (새로고침)"><img class="b-ink" src="img/logo/parranii-logo.png" alt="" width="490" height="516"><img class="b-wh" src="img/logo/parranii-logo-white.png" alt="" width="490" height="516"></a>
+<header class="top"><a href="./" id="to-top-link" class="home-link">gallery parranii</a><nav aria-label="바로가기"><div class="nv-g"><a href="#top" class="nv-p">works</a><div class="nv-sub"><a href="#posters">by material</a><a href="#room">all works</a></div></div><a href="#news">news</a><div class="nv-g"><a href="#about" class="nv-p">about</a><div class="nv-sub"><a href="#about">parranii</a><a href="#contact">contact</a></div></div><a href="#guestbook">guestbook</a><a id="admin-link" href="#admin" hidden>작품 관리</a></nav><button class="menu-btn" id="menu-btn" type="button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="menu"><i></i><i></i></button></header>
+
+<!-- ───────── 첫 화면: 검은 화면에 줄로 걸린 전시 포스터 (스크롤하면 배경이 흰색으로) ───────── -->
+<div class="hero-wrap" id="hero-wrap">
+  <section class="hero" id="hero" aria-label="gallery parranii">
+    <p class="h-tag">시선이 작품이 되는 곳,<br>파르라니</p>
+    <h1 class="giant" aria-label="Parranii"><span>P</span><span>a</span><span>r</span><span>r</span><span>a</span><span>n</span><span>i</span><span>i</span></h1>
+    <div class="h-rail" id="h-rail" aria-live="polite"><svg class="h-string" aria-hidden="true"><path id="h-strp" pathLength="1"/></svg></div>
+    <div class="h-cur"><span class="no" id="h-no"></span><h2 id="h-t"></h2><p id="h-p"></p><button class="h-btn" type="button" id="h-open">포스터 크게 보기</button></div>
+    <div class="h-bar"><button type="button" id="h-prev" aria-label="이전 포스터"><svg viewBox="0 0 28 12" aria-hidden="true"><path d="M27 6H2M7 1L2 6l5 5"/></svg></button><i aria-hidden="true"></i><button type="button" id="h-next" aria-label="다음 포스터"><svg viewBox="0 0 28 12" aria-hidden="true"><path d="M1 6h25M21 1l5 5-5 5"/></svg></button></div>
+    <div class="h-cue" aria-hidden="true">Scroll ↓</div>
+  </section>
+</div>
+
+<!-- ───────── 작품: 재료로 나눈 전시 포스터 ───────── -->
+<section class="pz" id="posters" aria-labelledby="pz-t">
+  <div class="pz-in">
+    <header class="pz-head"><h2 id="pz-t">Works</h2></header>
+    <div class="pz-board" id="pz-board"></div>
+  </div>
+</section>
+
+
+<!-- ───────── About ───────── -->
+<section class="about-page" id="about-page" hidden aria-labelledby="ab-t">
+  <div class="ab-in">
+    <h1 id="ab-t"></h1>
+    <div class="ab-grid"><div class="ab-text"><div class="ab-body" id="ab-body"></div><dl class="ab-lines" id="ab-lines"></dl></div><figure class="ab-fig" id="ab-fig" hidden><img id="ab-img" alt=""></figure></div>
+    <div class="ab-hist" id="ab-hist"></div>
+    <p class="ab-back"><a href="#top">← 처음으로</a></p>
+  </div>
+</section>
+
+<!-- ───────── News ───────── -->
+<section class="about-page" id="news-page" hidden aria-labelledby="nw-t">
+  <div class="ab-in">
+    <h1 id="nw-t">News</h1>
+    <p class="ab-body nw-intro">전시 소식과 작업 이야기를 전해요.</p>
+    <div class="nw-tags" id="nw-tags" role="group" aria-label="분류"></div>
+    <div class="nw-list" id="nw-list"></div>
+    <p class="ab-back"><a href="#top">← 처음으로</a></p>
+  </div>
+</section>
+
+<!-- ───────── Guestbook ───────── -->
+<section class="about-page" id="gb-page" hidden aria-labelledby="gb-t">
+  <div class="ab-in">
+    <h1 id="gb-t">Guestbook</h1>
+    <div class="gb-head">
+      <p class="ab-body gb-intro"><span class="gb-i-list">다녀가신 분들이 남긴 이야기와, 마음에 든 그림이에요.</span><span class="gb-i-write">나만의 캐릭터를 꾸미고, 다녀가신 흔적을 한 줄 남겨 주세요.</span></p>
+      <div class="gb-switch" role="group" aria-label="방명록 보기 · 남기기"><a href="#guestbook" class="gb-chip" data-m="list">방명록 보기 <span class="gb-cnt" id="gb-cnt"></span></a><a href="#guestbook-write" class="gb-chip" data-m="write">✏️ 방명록 남기기</a></div>
+    </div>
+    <form class="gb-form" id="gb-form" novalidate>
+      <div class="gb-me">
+        <button type="button" class="gb-ava big" id="gb-ava" aria-label="프로필 랜덤으로 바꾸기"></button>
+        <button type="button" class="gb-dice" id="gb-dice" aria-label="프로필 랜덤으로 바꾸기"><span aria-hidden="true">🎲</span> 랜덤</button>
+      </div>
+      <div class="gb-fields">
+        <div class="gb-dress"><div class="gb-tabs" id="gb-colors" role="tablist" aria-label="꾸미기"></div>
+        <div class="gb-pick" id="gb-pick" role="radiogroup" aria-label="고르기"></div></div>
+        <label class="gb-l"><span>이름 <small>(비워 두면 ‘익명의 관람객’)</small></span><input name="name" maxlength="12" autocomplete="nickname" placeholder="이름 또는 별명"></label>
+        <div class="gb-l gb-favq"><span>마음에 드는 그림이 있었나요? <small>(all works에서 골라요)</small></span><div class="gb-favpick" id="gb-favpick"></div></div>
+        <label class="gb-l">한마디<textarea name="msg" maxlength="140" rows="3" required placeholder="오늘 본 작품 중 마음에 남은 것, 작가에게 하고 싶은 말…"></textarea><span class="gb-count" id="gb-count">0 / 140</span></label>
+        <label class="gb-l gb-pwl"><span>비밀번호 <small>(선택 · 정해 두면 다른 기기에서도 내 글을 고치거나 지울 수 있어요)</small></span><input name="pw" type="password" maxlength="20" autocomplete="new-password" placeholder="4자 이상"></label>
+        <label class="inq-hp" aria-hidden="true">웹사이트<input name="website" tabindex="-1" autocomplete="off"></label>
+        <div class="gb-editbar" id="gb-editbar" hidden>내가 쓴 글을 고치는 중이에요 <button type="button" id="gb-editx">취소</button></div>
+        <div class="gb-foot"><button class="inq-send" type="submit">남기기</button><span class="inq-msg" id="gb-msg" aria-live="polite"></span></div>
+      </div>
+    </form>
+    <section class="gb-rank" id="gb-rank" hidden aria-labelledby="gb-rank-t"><h2 id="gb-rank-t">방문객이 고른 그림</h2><div class="gb-rank-list" id="gb-rank-list"></div></section>
+    <div class="gb-board" id="gb-board" aria-live="polite"></div>
+    <button class="gb-more" type="button" id="gb-more" hidden>더 보기</button>
+    <p class="ab-back"><a href="#top">← 처음으로</a></p>
+  </div>
+</section>
+
+<!-- ───────── Contact ───────── -->
+<section class="about-page" id="contact-page" hidden aria-labelledby="ct-t">
+  <div class="ab-in">
+    <h1 id="ct-t"></h1>
+    <div class="ab-body" id="ct-intro"></div>
+    <div class="ct-rows" id="ct-rows"></div>
+    <section class="inq" aria-labelledby="inq-t">
+      <h2 id="inq-t">문의하기</h2>
+      <form id="inq-form" novalidate>
+        <div class="inq-grid">
+          <label>성함<input name="name" type="text" autocomplete="name" required></label>
+          <label>연락처<input name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="010-0000-0000"></label>
+          <label class="wide">이메일<input name="email" type="email" autocomplete="email" placeholder="name@example.com"></label>
+          <label class="wide">문의 내용<textarea name="msg" rows="6" required placeholder="관심 있는 작품, 전시, 구입 · 대여 문의 등을 자유롭게 적어 주세요."></textarea></label>
+          <div class="wide inq-files"><span class="inq-fl">첨부파일 <small>(사진 · PDF, 3개까지)</small></span>
+            <label class="inq-pick">파일 고르기<input id="inq-file" type="file" multiple accept="image/*,.pdf,.hwp,.hwpx,.doc,.docx"></label>
+            <ul id="inq-flist" class="inq-flist"></ul></div>
+          <label class="inq-hp" aria-hidden="true">웹사이트<input name="website" tabindex="-1" autocomplete="off"></label>
+        </div>
+        <p class="inq-note">답변 받으실 연락처나 이메일 중 하나는 꼭 적어 주세요. 적어 주신 정보는 문의 답변에만 쓰여요.</p>
+        <div class="inq-foot"><button class="inq-send" type="submit">보내기</button><span id="inq-msg" class="inq-msg" aria-live="polite"></span></div>
+      </form>
+      <div id="inq-done" class="inq-done" hidden><p>문의가 잘 전달됐어요. 확인하고 연락드릴게요.</p><button type="button" id="inq-again" class="inq-again">다른 문의 보내기</button></div>
+    </section>
+    <p class="ab-back"><a href="#top">← 처음으로</a></p>
+  </div>
+</section>
+
+<div class="menu" id="menu" hidden role="dialog" aria-modal="true" aria-label="메뉴"><button class="menu-x" type="button" id="menu-x">Close</button><nav id="menu-nav" aria-label="메뉴"></nav></div>

@@ -1,0 +1,308 @@
+{
+ "at": 1794636915550,
+ "note": "사이트 파일 백업 (전시 · Works 묶음 · About · Contact)",
+ "exhibitions": [
+  {
+   "id": "9u4ynw9jili19bb3q08k",
+   "data": {
+    "ar": 1.2044887780548628,
+    "order": 6,
+    "period": "2026",
+    "poster": "",
+    "posterId": "71ec6868e1e6ba351572105c495ba59e",
+    "sub": "5th 개인전 준비 중",
+    "title": "최근작업",
+    "venue": "",
+    "workIds": [
+     "gjaa4qlkjfjy48ff1smn",
+     "b3vtc6udveijsrwebtax",
+     "xycran063xncy0nfd9t6",
+     "6qfujmn4bp13ny44e6xk",
+     "50dn45s2a4myy9c8w8ux",
+     "ciowckoh93gwnnzok8bt",
+     "89dj7o5cp2dl2kyj95sr",
+     "7ujeozyrfhfbsfsc9i91",
+     "qhckbzqzf60n1j8x11ce",
+     "kdr75m340p21f2wywokq",
+     "ptjgcl2jodanfge6dt2i",
+     "tlm8lil604jpz8ueeljp",
+     "1x0s3b3664gd79rkl6fe",
+     "83iy5li9gu1kt62x93gx",
+     "8xqpf7ew0tcjo783q5k5",
+     "r8deydtwfbouxzotic3y",
+     "q4hxyw9jn6zn9wbd9zts"
+    ]
+   }
+  },
+  {
+   "id": "e1",
+   "data": {
+    "ar": 0.6910016977928692,
+    "order": 1,
+    "period": "2014.8.23 – 9.5",
+    "poster": "img/p/pm1.jpg",
+    "sub": "1st Solo Exhibition",
+    "title": "기다리니, 아직도?",
+    "venue": "갤러리 잠시",
+    "workIds": [
+     "9rra2lvy2az0zza405cc",
+     "mmw1pvpooqin51w2s005",
+     "gw8bm5jjbyy3g6a4mcde",
+     "dy1ly5ys6ca53w7xt9yl",
+     "tv0fiei6m2dv3xru7p11",
+     "hhwwj509ift1pu2lfp9b",
+     "2m8g55bwjaf2xm4ximn7",
+     "v1z7usyxzmm2yllegyqm",
+     "4xnr2yp0qiqvxhcsioys"
+    ]
+   }
+  },
+  {
+   "id": "e2",
+   "data": {
+    "ar": 0.6666666666666666,
+    "order": 2,
+    "period": "2016.5.9 – 5.19",
+    "poster": "img/p/p0.jpg",
+    "sub": "김성순 개인전 · The 2nd Solo Exhibition",
+    "title": "괄호속이야기",
+    "venue": "갤러리 하이",
+    "workIds": [
+     "r9gfuxm46wzmjpumd1px",
+     "vw68n83cv8xus1ftsfxg",
+     "n4nd7h1mx5e8it7psd7c",
+     "vk1twjg61tzzda924sjx",
+     "p224abf1022v23t99652",
+     "kbzs8d5ie0bjc5jzwk2x",
+     "otlmbd2bn6zfhm06kjlp",
+     "08o4ooza3s0k1ohuc9vd",
+     "pimhzd32t4lddyfm3xt9",
+     "lcfbiymqn1ywv9rm9yxm",
+     "wu8kgw5xrqu19nyyxz3n",
+     "ps3y0jq1mnwpoyvxd4bn",
+     "xa5mq729lbtytkt0dd0p",
+     "059r72z4jahmiah1zz46",
+     "z6cz8sbie3gbhr1rrnae",
+     "cf2elf30bqgw08a2pos2",
+     "5i1jwllpa337o4bops8i",
+     "hj83xp2fxj6k4v35jiwi",
+     "fe0ybe1ixl0vg2puk11t"
+    ]
+   }
+  },
+  {
+   "id": "e3",
+   "data": {
+    "ar": 0.7076923076923077,
+    "order": 3,
+    "period": "2016.11.17 – 12.3",
+    "poster": "img/p/p3.jpg",
+    "sub": "3인전",
+    "title": "啐啄同時展",
+    "venue": "갤러리 하이",
+    "workIds": [
+     "gr4mqmu7denhjsuvnryp",
+     "2sk86a60zv3z841fadkr",
+     "dqintbsyh11whptt7bw7",
+     "cux8t0j94u62mn3rnouj",
+     "vx4n6k2lqrax6bvvrbnw",
+     "bzjgdmvq1p4qtn1f93z3",
+     "dkq52izj0ujuq543s55p",
+     "8hpdarzt4jnbqde8zal7",
+     "7wg9c3pbkbqrw6vyobtu",
+     "lqlx6maasr8ohw494i6e",
+     "b1v72rcwwz81rge2e843",
+     "mopf82j03xpmrftl6og5"
+    ]
+   }
+  },
+  {
+   "id": "e4",
+   "data": {
+    "ar": 1.3782542113323124,
+    "order": 4,
+    "period": "2017.9.9 – 9.14",
+    "poster": "img/p/p2.jpg",
+    "sub": "김성순 개인전 · The 3rd Solo Exhibition",
+    "title": "길아, 너 거기 있니",
+    "venue": "ARTION",
+    "workIds": [
+     "q0pofvp9x3n09p2hn0di",
+     "uuaqvqvtuheyxu0urqkf",
+     "9agbrmtqa2lysqe2jaga",
+     "kes4n5nn48ybzw2mufhc",
+     "mjoloayawa0bwo7l4sje",
+     "z71p1s2oktz4s53sd73u",
+     "v85l239bpjbiunx6xlwt",
+     "b0rrhrsto3fmkpwifgh6",
+     "w6tz7x2c2xa1s2upf37g",
+     "o4tknja5wnwcc04nzsb0",
+     "dccq74028rfobwzsgq1t",
+     "3v54ypfp158a6m2kbs1a",
+     "xkcfnso2shmj73kmom34"
+    ]
+   }
+  },
+  {
+   "id": "e5",
+   "data": {
+    "ar": 0.4093333333333333,
+    "order": 5,
+    "period": "2020.9.7 – 9.29",
+    "poster": "img/p/p1.jpg",
+    "sub": "김성순 초대전 · The 4th Solo Exhibition",
+    "title": "보통의 존재",
+    "venue": "매화나무 두 그루",
+    "workIds": [
+     "n2cxl2x4d27avq8db48p",
+     "06fjzso7e05yuup45v0v",
+     "onzfcf0nqbg1xlbxvmvv",
+     "kjbcfj7y8uzqd1m83kn8",
+     "pq2p243ywqid052uekx2",
+     "8mnil3vlkj37073bb5wj",
+     "yiu0lvoxv6u5goka7oyf",
+     "14t112qn8kud20s2osw4",
+     "hcm70m9yuxwrptep8xaz",
+     "2v7szsbxxkjxx622c3yu",
+     "kmx0n0xxnt38ii3msvkv",
+     "ogfmr1v1lwpi1cpmk837",
+     "m1sjl1m8s40c1b3m33cm",
+     "coqpvbo1t1c1nhld09pu",
+     "hky5887u60m9uklo30m2",
+     "umslr4ljw00v060gncm4",
+     "612ocgyq4r8hcet0tyva",
+     "z7h65571oduocup0f62o",
+     "dt2e56uniosnq3xamitj",
+     "ox9p70fmcqro13mb2to7",
+     "up25f8f6fgsi5kfvpc10",
+     "id5749or1fm9rlyuzva8",
+     "udzujbnb0nf8dl0a2c4h",
+     "pzspyb2bvkppt6t1v2qo",
+     "cmxch4xsuetqe1glsaob",
+     "bq2g1es7ujpj5ex63g7n",
+     "bqueiyfgqinvl3jru6cf",
+     "3su35wx7ex5u8ybzi28h",
+     "xvoq4h9rce0wcflgabx3",
+     "yp9b9vkntj5rnyuqabj5"
+    ]
+   }
+  }
+ ],
+ "groups": [
+  {
+   "id": "g1",
+   "data": {
+    "ar": 0.5,
+    "desc": "한지와 종이 위에 한국화물감, 먹으로 그린 작품",
+    "en": "Hanji & Korean Pigment",
+    "name": "한지 · 한국화물감",
+    "order": 1,
+    "poster": "img/p/mat1.jpg"
+   }
+  },
+  {
+   "id": "g2",
+   "data": {
+    "ar": 1,
+    "desc": "종이·캔버스·나무 위에 과슈로 그린 작품",
+    "en": "Acrylic & Gouache",
+    "name": "아크릴릭 · 과슈",
+    "order": 2,
+    "poster": "img/p/mat2.jpg"
+   }
+  },
+  {
+   "id": "g3",
+   "data": {
+    "ar": 1.3333333333333333,
+    "desc": "캔버스에 아크릴릭과 자개로 작업한 작은 작품들",
+    "en": "Mother-of-pearl",
+    "name": "자개",
+    "order": 3,
+    "poster": "img/p/mat4.jpg"
+   }
+  },
+  {
+   "id": "g4",
+   "data": {
+    "ar": 0.75,
+    "desc": "오일파스텔과 색연필로 그린 작품",
+    "en": "Oil Pastel",
+    "name": "오일파스텔",
+    "order": 4,
+    "poster": "img/p/mat3.jpg"
+   }
+  },
+  {
+   "id": "g5",
+   "data": {
+    "ar": 0.8002853067047075,
+    "desc": "사진을 피그먼트 프린트로 옮긴 작품",
+    "en": "Photo Print",
+    "name": "사진 · 프린트",
+    "order": 5,
+    "poster": "img/p/mat5.jpg"
+   }
+  },
+  {
+   "id": "g6",
+   "data": {
+    "ar": 0.7692307692307693,
+    "desc": "다섯 묶음에 넣기 애매한 작품들 (오브제, 혼합 재료)",
+    "en": "Objects & Others",
+    "name": "기타",
+    "order": 7,
+    "poster": "img/p/mat6.jpg"
+   }
+  },
+  {
+   "id": "weoc2do02ahp3t7lp7jd",
+   "data": {
+    "ar": 0.8,
+    "desc": "흙으로 빚은 기물들",
+    "en": "CERAMICS",
+    "name": "도자기",
+    "order": 6,
+    "poster": "",
+    "posterId": "d2b33308c621e196ce6a2e773bcad0f9"
+   }
+  }
+ ],
+ "settings": [
+  {
+   "id": "about",
+   "data": {
+    "title": "About",
+    "body": "‘파르라니’는 김성순 작가의 \n시선이 머무는 그 무언가를 그림이나 오브제로\n표현한 작품을 전시하는 갤러리입니다.",
+    "lines": "",
+    "image": "",
+    "imageId": ""
+   }
+  },
+  {
+   "id": "contact",
+   "data": {
+    "intro": "전시와 작품 문의는 아래로 연락해 주세요.",
+    "items": [
+     {
+      "k": "오픈채팅",
+      "v": "https://open.kakao.com/o/sXzaN2Wi"
+     },
+     {
+      "k": "이메일",
+      "v": "parranii@naver.com"
+     }
+    ],
+    "lines": "오픈채팅 | https://open.kakao.com/o/sXzaN2Wi\n이메일 | parranii@naver.com",
+    "title": "Contact"
+   }
+  },
+  {
+   "id": "site",
+   "data": {
+    "exSort": "date"
+   }
+  }
+ ],
+ "at_ms": 1794646261096
+}
