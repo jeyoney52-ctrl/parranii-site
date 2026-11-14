@@ -933,7 +933,7 @@ body.pk-open { overflow: hidden; }
 #lightbox { z-index: 130; }
 .gb-pwl input { max-width: 260px; }
 .gb-mine.pw { opacity: 0; transition: opacity .2s; } .gb-note:hover .gb-mine.pw, .gb-mine.pw:focus-within { opacity: 1; }
-@media (hover: none) { .gb-mine.pw { opacity: .7; } }
+
 .gb-pw { width: min(360px, 100%); background: #fff; border-radius: 18px; padding: 20px; display: grid; gap: 12px; box-shadow: 0 30px 80px rgba(0,0,0,.25); }
 .gb-pw p { margin: 0; font-size: 14px; line-height: 1.6; } .gb-pw input { font: inherit; font-size: 16px; padding: 10px 14px; border: 1px solid #d9d7df; border-radius: 12px; }
 .gb-pw div { display: flex; gap: 8px; justify-content: flex-end; } .gb-mini.strong2 { background: var(--ink); color: #fff; border-color: var(--ink); }
@@ -1046,6 +1046,13 @@ html, body { margin: 0; } /* 검은 첫 화면 · 흰 Works가 화면 끝까지 
 /* 모바일 아래 메뉴: 진행선 · 선택 표시 = 관람객 옷 색 */
 .dock-bar { background: var(--me, var(--cobalt)) !important; }
 .dock-nav button[aria-current="true"] { color: var(--me-ink, var(--cobalt)) !important; }
+
+/* 고치기 · 지우기: 올리거나 눌렀을 때만 */
+.gb-mine, .gb-mine.pw { position: absolute; top: 14px; right: 14px; margin: 0; opacity: 0; pointer-events: none; transition: opacity .2s; }
+@media (hover: hover) { .gb-note:hover .gb-mine { opacity: 1; pointer-events: auto; } }
+.gb-note.open .gb-mine, .gb-mine:focus-within { opacity: 1; pointer-events: auto; }
+@media (hover: none) { .gb-mine.pw { opacity: 0; } .gb-note.open .gb-mine { opacity: 1; } .gb-note:has(.gb-mine) { cursor: pointer; } }
+.gb-mine button { background: rgba(255,255,255,.9); }
 </style>
 
 <a class="brand home-link" href="./" aria-label="gallery parranii 처음 화면으로 (새로고침)"><img class="b-ink" src="img/logo/parranii-logo.png" alt="" width="490" height="516"><img class="b-wh" src="img/logo/parranii-logo-white.png" alt="" width="490" height="516"></a>
@@ -3235,7 +3242,7 @@ addEventListener("hashchange", () => {
   const workChip = x => { const w = workOf(x.w); if (!w) return "";
     return `<button type="button" class="gb-fav" data-work="${e(w.id)}"><img src="${e(thumbSrc(w))}" alt="" loading="lazy"><span><small>♥ 마음에 든 그림</small>No. ${wNo(w)} ${e(w.title || "")}</span></button>`; };
   const note = (x, fresh) => { const c = COL[x.c] || COL.yellow, mine = x.id && MINE()[x.id];
-    return `<article class="gb-note${fresh ? " fresh" : ""}" style="--c:${c};--r:${tilt((x.id || x.t || "") + x.msg)}deg"><header><span class="gb-ava" aria-hidden="true">${face(x.s, "rgba(255,255,255,.7)")}</span><div><b>${e(x.name || "익명의 관람객")}</b><time>${e(when(x.t))}${x.e ? " · 고침" : ""}</time></div></header><p>${e(x.msg)}</p>${workChip(x)}${x.id ? `<div class="gb-mine${mine ? "" : " pw"}"><button type="button" data-edit="${e(x.id)}">고치기</button><button type="button" data-del="${e(x.id)}">지우기</button></div>` : ""}</article>`; };
+    return `<article class="gb-note${fresh ? " fresh" : ""}" style="--c:${c};--r:${tilt((x.id || x.t || "") + x.msg)}deg"><header><span class="gb-ava" aria-hidden="true">${face(x.s, "rgba(255,255,255,.7)")}</span><div><b>${e(x.name || "익명의 관람객")}</b><time>${e(when(x.t))}${x.e ? " · 고침" : ""}</time></div></header><p>${e(x.msg)}</p>${workChip(x)}${x.id ? `<div class="gb-mine${mine ? " my" : " pw"}"><button type="button" data-edit="${e(x.id)}">고치기</button><button type="button" data-del="${e(x.id)}">지우기</button></div>` : ""}</article>`; };
 
   /* ── 방문자 페이지 ── */
   const page = A("gb-page");
@@ -3351,6 +3358,12 @@ addEventListener("hashchange", () => {
       else { ta.value = ""; fav = ""; paintFav(); A("gb-count").textContent = "0 / 140"; }
     };
     A("gb-editx").addEventListener("click", () => { setEditing(null); msg.textContent = ""; });
+    /* 고치기 · 지우기는 쪽지에 마우스를 올리거나(모바일은 쪽지를 눌렀을 때) 나타난다 */
+    board.addEventListener("click", ev => {
+      if (ev.target.closest("button, a")) return;
+      const n = ev.target.closest(".gb-note"); if (!n || !n.querySelector(".gb-mine")) return;
+      const on = !n.classList.contains("open"); board.querySelectorAll(".gb-note.open").forEach(x => x.classList.remove("open")); n.classList.toggle("open", on);
+    });
     board.parentElement.addEventListener("click", async ev => {
       const wb = ev.target.closest("[data-work]"); if (wb) { const w = workOf(wb.dataset.work); if (w && typeof lb !== "undefined") lb.open(w, wb.querySelector("img") || wb); return; }
       const eb = ev.target.closest("[data-edit]"); if (eb) { const x = items.find(i => i.id === eb.dataset.edit); if (!x) return; const key = MINE()[x.id] || await askPw("글을 고치려면 남길 때 정한 비밀번호를 적어 주세요."); if (key) { x.key = key; setEditing(x); } return; }
