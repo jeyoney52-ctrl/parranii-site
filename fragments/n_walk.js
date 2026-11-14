@@ -121,10 +121,10 @@
   function openPop() {
     if (pop) return; draft = { ...me }; part = "hair";
     pop = document.createElement("div"); pop.className = "wkp"; pop.setAttribute("role", "dialog"); pop.setAttribute("aria-modal", "true"); pop.setAttribute("aria-label", "내 관람객 꾸미기");
-    pop.innerHTML = `<div class="wkp-in"><div class="wkp-h"><b>내 관람객 꾸미기</b><button type="button" class="wkp-x" aria-label="닫기">✕</button></div>
+    pop.innerHTML = `<div class="wkp-in"><div class="wkp-h"><div class="wkp-tt"><b>내 관람객 꾸미기</b><span class="wkp-note">방명록 캐릭터에도 같이 쓰여요</span></div><button type="button" class="inq-send wkp-save">저장</button><button type="button" class="wkp-x" aria-label="닫기">✕</button></div>
       <div class="wkp-body"><div class="wkp-me"><div class="wkp-big gb-ava big"></div><button type="button" class="gb-dice wkp-dice"><span aria-hidden="true">🎲</span> 랜덤</button></div>
         <div class="gb-dress"><div class="gb-tabs wkp-tabs" role="tablist">${TABS.map(([k, l]) => `<button type="button" role="tab" data-p="${k}">${l}</button>`).join("")}</div><div class="gb-pick wkp-pick"></div></div></div>
-      <div class="wkp-foot"><span class="wkp-note">방명록 캐릭터에도 같이 쓰여요</span><button type="button" class="gb-mini" data-x>취소</button><button type="button" class="inq-send wkp-save">저장</button></div></div>`;
+</div>`;
     document.body.appendChild(pop); document.body.classList.add("pk-open");
     paintDraft(false);
     pop.querySelector(".wkp-tabs").addEventListener("click", ev => { const b = ev.target.closest("[data-p]"); if (b) { part = b.dataset.p; drawPick(); } });
