@@ -3822,10 +3822,12 @@ addEventListener("hashchange", () => {
         if (wrote()) mSay("끝까지 봐 주셨네요! 👏", 4500); else mSay("끝까지 봐 주셨네요! 👏\n방명록도 남겨주실래요? 💌", 6000, () => { location.hash = "guestbook-write"; }); }
     }
     addEventListener("scroll", mPlace, { passive: true }); addEventListener("resize", mPlace);
-    /* 아래 메뉴가 처음 나타나면, 아직 꾸미지 않은 사람에게 한 번만 ‘DIY ME!’ */
-    new MutationObserver(() => { if (!isM() || !dock.classList.contains("show") || diy()) return;
-      try { if (sessionStorage.getItem("pr-mw-diy")) return; sessionStorage.setItem("pr-mw-diy", "1"); } catch {}
-      setTimeout(() => mSay("DIY ME! ✂️", 4000), 600); }).observe(dock, { attributes: true, attributeFilter: ["class"] });
+    /* 아래 메뉴가 나타나면: 인사 → ‘DIY ME!’ (누르면 꾸미기). 한동안 가만히 보고 있으면 한 번 더 ‘DIY ME!’ */
+    let greeted = false, again = false, mStill = 0;
+    const diyMsg = () => mSay("DIY ME! ✂️", 4500);
+    new MutationObserver(() => { if (!isM() || !dock.classList.contains("show") || greeted) return; greeted = true;
+      setTimeout(() => { mSay(greet(), 2800); setTimeout(() => { if (mBub.hidden) diyMsg(); }, 3100); }, 500); }).observe(dock, { attributes: true, attributeFilter: ["class"] });
+    addEventListener("scroll", () => { if (!isM() || again || !greeted) return; clearTimeout(mStill); mStill = setTimeout(() => { if (mBub.hidden && dock.classList.contains("show")) { again = true; diyMsg(); } }, 12000); }, { passive: true });
     paintAva(); mPlace();
   }
   /* 방명록에서 캐릭터를 바꾸면 걷는 관람객도 같이 바뀐다 */
