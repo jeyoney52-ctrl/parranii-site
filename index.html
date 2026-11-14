@@ -762,6 +762,7 @@ body.about .menu[hidden], body.contact .menu[hidden] { display: none !important;
 .inq-flist li { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid #e5e3ea; border-radius: 10px; background: #fff; color: var(--ink); font-size: 13.5px; }
 .inq-flist li span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .inq-flist li em { font-style: normal; color: var(--mute); font-size: 12px; }
 .inq-flist button { border: 0; background: none; color: var(--mute); cursor: pointer; font-size: 18px; line-height: 1; padding: 0 2px; } .inq-flist button:hover { color: #c2414b; }
+.inq-msg a { color: inherit; text-decoration: underline; margin-left: 4px; white-space: nowrap; }
 </style>
 
 <a class="brand home-link" href="./" aria-label="gallery parranii 처음 화면으로 (새로고침)"><img class="b-ink" src="img/logo/parranii-logo.png" alt="" width="490" height="516"><img class="b-wh" src="img/logo/parranii-logo-white.png" alt="" width="490" height="516"></a>
@@ -2600,18 +2601,19 @@ if (sessionStorage.getItem("pr-scroll-top")) { try { sessionStorage.removeItem("
       if (v("email") && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v("email"))) { msg.textContent = "이메일 주소를 다시 확인해 주세요."; msg.dataset.err = "1"; return; }
       const body = new URLSearchParams({ [F.name]: v("name"), [F.phone]: v("phone"), [F.email]: v("email"), [F.msg]: v("msg") });
       btn.disabled = true; msg.dataset.err = ""; msg.textContent = files.length ? "파일과 함께 보내는 중… 잠시만 기다려 주세요." : "보내는 중…";
+      /* 모든 문의는 작가님 Apps Script로 보낸다(구글 폼은 파일 질문 때문에 로그인이 필요해 바로 제출이 안 됨).
+         응답을 읽어서 시트에 실제로 들어갔을 때만 ‘전달됐어요’를 보여 준다. */
       try {
-        if (files.length) {
-          const payload = { name: v("name"), phone: v("phone"), email: v("email"), msg: v("msg"), website: "",
-            files: await Promise.all(files.map(async f => ({ name: f.name, type: f.type || "application/octet-stream", data: await b64(f) }))) };
-          await fetch(SCRIPT, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
-        } else await fetch(FORM + "/formResponse", { method: "POST", mode: "no-cors", body });
+        const payload = { name: v("name"), phone: v("phone"), email: v("email"), msg: v("msg"), website: "",
+          files: await Promise.all(files.map(async f => ({ name: f.name, type: f.type || "application/octet-stream", data: await b64(f) }))) };
+        const r = await fetch(SCRIPT, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
+        const j = await r.json().catch(() => null);
+        if (!r.ok || !j || !j.ok) throw new Error((j && j.error) || "status " + r.status);
         form.reset(); files = []; drawFiles(); form.hidden = true; A("inq-done").hidden = false; msg.textContent = "";
-      } catch {
-        if (files.length) { msg.textContent = "지금 이 화면에서는 파일을 보낼 수 없어요. parranii.com에서 다시 보내 주세요."; msg.dataset.err = "1"; btn.disabled = false; return; }
-        /* 이 화면에서 바로 보낼 수 없을 때(claude.ai 미리보기 등): 내용이 채워진 구글 폼을 새 창으로 연다 */
-        window.open(FORM + "/viewform?usp=pp_url&" + body.toString(), "_blank", "noopener");
-        msg.textContent = "새 창에서 열린 문의서의 ‘제출’을 눌러 주세요."; msg.dataset.err = "";
+      } catch (err) {
+        console.warn("문의 전송 실패:", err);
+        msg.innerHTML = `문의를 보내지 못했어요. 잠시 뒤 다시 눌러 주시거나, 위 오픈채팅 · 이메일로 연락 주세요. <a href="${e(FORM + "/viewform?usp=pp_url&" + body.toString())}" target="_blank" rel="noopener">구글 폼으로 보내기</a>`;
+        msg.dataset.err = "1";
       } finally { btn.disabled = false; }
     });
     form.addEventListener("input", () => { if (msg.dataset.err === "1") { msg.textContent = ""; msg.dataset.err = ""; } });
