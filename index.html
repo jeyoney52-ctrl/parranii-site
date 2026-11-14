@@ -1007,6 +1007,7 @@ body.pk-open { overflow: hidden; }
 .wk-bub:hover { filter: brightness(.97); }
 .wk-me .wk-bub { text-wrap: balance; }
 .wk-me .wk-bub { white-space: pre-line; max-width: 150px; }
+.wk-me .wk-bub.wide { max-width: 210px; text-wrap: wrap; }
 </style>
 
 <a class="brand home-link" href="./" aria-label="gallery parranii 처음 화면으로 (새로고침)"><img class="b-ink" src="img/logo/parranii-logo.png" alt="" width="490" height="516"><img class="b-wh" src="img/logo/parranii-logo-white.png" alt="" width="490" height="516"></a>
@@ -3583,6 +3584,7 @@ addEventListener("hashchange", () => {
   /* 말 넣기: 이모티콘이 혼자 다음 줄로 떨어지지 않게 앞 낱말에 붙이고, 줄이 나뉘면 말풍선 폭을 글줄에 맞춰 좁힌다 */
   function setText(t) {
     bub.textContent = String(t).replace(/ (?=\p{Extended_Pictographic})/gu, "\u00a0");
+    bub.classList.toggle("wide", String(t).includes("\n"));
     bub.style.width = "";
     requestAnimationFrame(() => { const r = document.createRange(); r.selectNodeContents(bub); const rs = [...r.getClientRects()];
       if (rs.length > 1) { const w = Math.max(...rs.map(x => x.right)) - Math.min(...rs.map(x => x.left)); const cs = getComputedStyle(bub);
