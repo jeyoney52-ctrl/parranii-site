@@ -19,7 +19,8 @@
   const meEl = wk.querySelector("#wk-me"), ava = wk.querySelector("#wk-ava"), bub = wk.querySelector("#wk-bub"), dots = wk.querySelector(".wk-dots");
   /* 말풍선 배경은 관람객 옷 색을 연하게 */
   const tint = (hex, k) => { const n = parseInt(hex.slice(1), 16), f = v => Math.round(v + (255 - v) * k); return `rgb(${f(n >> 16)}, ${f((n >> 8) & 255)}, ${f(n & 255)})`; };
-  const paintAva = () => { ava.innerHTML = PrAva.svg(me.s, ""); const c = PrAva.CLO[PrAva.parse(me.s)[PrAva.KEYS.indexOf("color")]] || "#ffffff"; bub.style.setProperty("--bub", c.toLowerCase() === "#ffffff" ? "#ffffff" : tint(c, .72)); };
+  const painters = [];
+  const paintAva = () => { ava.innerHTML = PrAva.svg(me.s, ""); const c = PrAva.CLO[PrAva.parse(me.s)[PrAva.KEYS.indexOf("color")]] || "#ffffff"; const bg = c.toLowerCase() === "#ffffff" ? "#ffffff" : tint(c, .72); bub.style.setProperty("--bub", bg); painters.forEach(f => f(bg)); };
   /* 말 넣기: 이모티콘이 혼자 다음 줄로 떨어지지 않게 앞 낱말에 붙이고, 줄이 나뉘면 말풍선 폭을 글줄에 맞춰 좁힌다 */
   function setText(t) {
     bub.textContent = String(t).replace(/ (?=\p{Extended_Pictographic})/gu, "\u00a0");
@@ -151,13 +152,14 @@
   bub.addEventListener("click", () => { if (bub._click) { bub._click(); return; } if (ask) { location.hash = "guestbook-write"; return; } openPop(); });
   /* 관람객을 여러 번 누르면 간지러워한다 (한 번 누르면 꾸미기) */
   let taps = [], tapT = 0;
-  ava.addEventListener("click", () => {
+  function tap(el, tickle) {
     const now = Date.now(); taps = taps.filter(t => now - t < 1200); taps.push(now);
-    meEl.classList.remove("tickle"); void meEl.offsetWidth; meEl.classList.add("tickle");
+    el.classList.remove("tickle"); void el.offsetWidth; el.classList.add("tickle");
     clearTimeout(tapT);
-    if (taps.length >= 3) { taps = []; hold("간지러워요 😆", 2200); return; }
+    if (taps.length >= 3) { taps = []; tickle(); return; }
     tapT = setTimeout(() => { if (taps.length === 1) openPop(); taps = []; }, 420);
-  });
+  }
+  ava.addEventListener("click", () => tap(meEl, () => hold("간지러워요 😆", 2200)));
   /* 작품을 크게 보고 닫으면, 마음에 들었는지 묻는다 → 누르면 그 그림을 고른 채로 방명록 남기기 */
   const lbBox = document.getElementById("lightbox");
   if (lbBox) {
@@ -166,10 +168,44 @@
       const on = lbBox.classList.contains("on");
       if (on && !wasOn) { const t = (document.getElementById("lb-title") || {}).textContent || ""; const w = typeof WORKS !== "undefined" && WORKS.find(x => x.title === t); favId = w ? w.id : ""; }
       if (!on && wasOn && wk.classList.contains("show") && !document.body.classList.contains("guest")) {
-        const id = favId; hold("이 그림 마음에 드세요? ♥", 4500, () => { try { if (id) sessionStorage.setItem("pr-gb-fav", id); } catch {} location.hash = "guestbook-write"; });
+        const id = favId, go = () => { try { if (id) sessionStorage.setItem("pr-gb-fav", id); } catch {} location.hash = "guestbook-write"; };
+        if (isM()) mSay && mSay("이 그림 마음에 드세요? ♥", 4500, go); else hold("이 그림 마음에 드세요? ♥", 4500, go);
       }
       wasOn = on;
     }).observe(lbBox, { attributes: true, attributeFilter: ["class"] });
+  }
+  /* ── 모바일: 아래 메뉴의 파란 진행선 위를 작은 관람객이 걷는다. 말풍선은 꼭 필요할 때만 잠깐 ── */
+  const isM = () => matchMedia("(max-width: 720px)").matches;
+  let mSay = null;
+  const dock = document.getElementById("dock");
+  if (dock) {
+    const mw = document.createElement("div"); mw.className = "mw";
+    mw.innerHTML = `<button type="button" class="mw-bub" hidden></button><button type="button" class="mw-ava" aria-label="내 관람객 꾸미기"></button>`;
+    dock.appendChild(mw);
+    const mAva = mw.querySelector(".mw-ava"), mBub = mw.querySelector(".mw-bub");
+    painters.push(bg => { mAva.innerHTML = PrAva.svg(me.s, ""); mBub.style.setProperty("--bub", bg); });
+    let mT = 0, mClick = null, endShown = false, mIdle = 0, p = 0;
+    mSay = (t, ms, cb) => {
+      mBub.textContent = String(t).replace(/ (?=\p{Extended_Pictographic})/gu, "\u00a0"); mBub.hidden = false;
+      mBub.classList.toggle("r", p > .5); mBub.classList.remove("in"); void mBub.offsetWidth; mBub.classList.add("in");
+      mClick = cb || null; clearTimeout(mT); mT = setTimeout(() => { mBub.hidden = true; mClick = null; }, ms);
+    };
+    mBub.addEventListener("click", () => { const f = mClick; mBub.hidden = true; if (f) f(); else openPop(); });
+    mAva.addEventListener("click", () => tap(mw, () => mSay("간지러워요 😆", 2200)));
+    function mPlace() {
+      if (!isM()) return;
+      p = Math.min(1, Math.max(0, scrollY / maxY()));
+      mw.style.left = `calc(${p.toFixed(4)} * (100% - 48px) + 24px)`; // 양 끝에서도 관람객과 말풍선이 화면 안에 들어오게
+      mw.classList.add("walking"); clearTimeout(mIdle); mIdle = setTimeout(() => mw.classList.remove("walking"), 380);
+      if (!endShown && p > .9 && scrollY >= maxY() - 120 && dock.classList.contains("show")) { endShown = true;
+        if (wrote()) mSay("끝까지 봐 주셨네요! 👏", 4500); else mSay("끝까지 봐 주셨네요! 👏\n방명록도 남겨주실래요? 💌", 6000, () => { location.hash = "guestbook-write"; }); }
+    }
+    addEventListener("scroll", mPlace, { passive: true }); addEventListener("resize", mPlace);
+    /* 아래 메뉴가 처음 나타나면, 아직 꾸미지 않은 사람에게 한 번만 ‘DIY ME!’ */
+    new MutationObserver(() => { if (!isM() || !dock.classList.contains("show") || diy()) return;
+      try { if (sessionStorage.getItem("pr-mw-diy")) return; sessionStorage.setItem("pr-mw-diy", "1"); } catch {}
+      setTimeout(() => mSay("DIY ME! ✂️", 4000), 600); }).observe(dock, { attributes: true, attributeFilter: ["class"] });
+    paintAva(); mPlace();
   }
   /* 방명록에서 캐릭터를 바꾸면 걷는 관람객도 같이 바뀐다 */
   addEventListener("pr-me", ev => { if (ev.detail && ev.detail !== me) { me = { ...ev.detail }; paintAva(); } });

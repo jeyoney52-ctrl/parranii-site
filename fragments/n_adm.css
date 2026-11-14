@@ -493,3 +493,30 @@ body.pk-open { overflow: hidden; }
 .wk-me .wk-bub { text-wrap: balance; }
 .wk-me .wk-bub { white-space: pre-line; max-width: 150px; }
 .wk-me .wk-bub.wide { max-width: 210px; text-wrap: wrap; }
+
+/* ───────── 모바일 관람객 (아래 메뉴 진행선 위) ───────── */
+.mw { display: none; }
+@media (max-width: 720px) {
+  .mw { display: block; position: absolute; top: -34px; left: 0; width: 0; height: 0; z-index: 3; transition: left .45s cubic-bezier(.3,.7,.3,1); pointer-events: none; }
+  .mw-ava { position: absolute; left: -17px; bottom: -34px; width: 34px; height: 34px; padding: 0; border: 0; background: none; pointer-events: auto; transform-origin: 50% 100%; }
+  .dock { overflow: visible; }
+  .mw-ava svg { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+  .mw.walking .mw-ava { animation: wkbob .3s steps(2) infinite; }
+  .mw.tickle .mw-ava { animation: wktick .35s ease; }
+  .mw-bub { position: absolute; bottom: 8px; left: -24px; pointer-events: auto; font: inherit; font-family: var(--font-display, inherit); font-size: 12.5px; line-height: 1.45; color: var(--ink); background: var(--bub, #fff); border: 2px solid var(--ink); border-radius: 10px; box-shadow: 2px 2px 0 var(--ink); padding: 6px 10px; white-space: pre; text-align: left; }
+  .mw-bub.r { left: auto; right: -24px; text-align: right; }
+  .mw-bub[hidden] { display: none; }
+  .mw-bub.in { animation: mwin .35s cubic-bezier(.3,1.5,.5,1); }
+  .mw-bub::after { content: ""; position: absolute; left: 18px; bottom: -8px; border: 5px solid transparent; border-top: 6px solid var(--ink); border-bottom: 0; }
+  .mw-bub.r::after { left: auto; right: 18px; }
+  @keyframes mwin { from { opacity: 0; transform: translateY(6px) scale(.9); } }
+  /* 꾸미기 창은 아래에서 올라오는 시트로 */
+  .wkp { place-items: end center; padding: 0; }
+  .wkp-in { width: 100%; max-height: 88svh; border-radius: 20px 20px 0 0; padding: 16px 14px calc(14px + env(safe-area-inset-bottom, 0px)); }
+  .wkp-body { grid-template-columns: 1fr; gap: 12px; }
+  .wkp-me { grid-auto-flow: column; justify-content: start; align-items: center; }
+  .wkp .gb-ava.big { width: 96px; height: 96px; }
+}
+@media (max-width: 720px) and (prefers-reduced-motion: reduce) { .mw, .mw.walking .mw-ava, .mw-bub.in { transition: none; animation: none; } }
+@media (max-width: 720px) { .mw-bub { left: -20px; } .mw-bub.r { right: -20px; } }
+html, body { margin: 0; } /* 검은 첫 화면 · 흰 Works가 화면 끝까지 꽉 차게 */
