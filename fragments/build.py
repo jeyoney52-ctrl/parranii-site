@@ -139,7 +139,7 @@ rep('      // 사진 바꾸기\n', """      row.querySelector("[data-edit]").add
         onReplace: () => row.querySelector("input[type=file]").click() }));
       // 사진 바꾸기
 """)
-js += '\n' + open(V + 'n_conn.js', encoding='utf-8').read() + '\n' + open(V + 'n_inq.js', encoding='utf-8').read() + '\n' + open(V + 'n_ava.js', encoding='utf-8').read() + '\n' + open(V + 'n_gb.js', encoding='utf-8').read() + '\n' + open(V + 'n_news.js', encoding='utf-8').read()
+js += '\n' + open(V + 'n_conn.js', encoding='utf-8').read() + '\n' + open(V + 'n_inq.js', encoding='utf-8').read() + '\n' + open(V + 'n_ava.js', encoding='utf-8').read() + '\n' + open(V + 'n_gb.js', encoding='utf-8').read() + '\n' + open(V + 'n_news.js', encoding='utf-8').read() + '\n' + open(V + 'n_walk.js', encoding='utf-8').read()
 i = s.rindex('</script>'); s = s[:i] + js + s[i:]
 s = s.replace('작품 관리', '관리').replace('작품관리', '관리').replace('data-to="top">맨 위<', 'data-to="top">top<')
 open('/home/user/parranii/index.html', 'w', encoding='utf-8').write(s)

@@ -59,7 +59,9 @@ addEventListener("hashchange", () => {
       ava.innerHTML = PrAva.svg(me.s, COL[me.c]); drawPick();
       if (pop) { ava.classList.remove("pop"); void ava.offsetWidth; ava.classList.add("pop"); }
       try { localStorage.setItem("pr-gb-me", JSON.stringify(me)); } catch {}
+      dispatchEvent(new CustomEvent("pr-me", { detail: me }));
     };
+    addEventListener("pr-me", ev => { if (ev.detail && ev.detail !== me && !editing) { me = { ...ev.detail }; paintMe(false); } });
     const roll = () => { me = { s: PrAva.random(), c: rnd(CK) }; paintMe(true); };
     A("gb-dice").addEventListener("click", roll); ava.addEventListener("click", roll);
     cols.addEventListener("click", ev => { const b = ev.target.closest("button[data-p]"); if (b) { part = b.dataset.p; drawPick(); } });
