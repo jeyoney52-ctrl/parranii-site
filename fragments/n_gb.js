@@ -28,7 +28,7 @@ addEventListener("hashchange", () => {
   const workChip = x => { const w = workOf(x.w); if (!w) return "";
     return `<button type="button" class="gb-fav" data-work="${e(w.id)}"><img src="${e(thumbSrc(w))}" alt="" loading="lazy"><span><small>♥ 마음에 든 그림</small>No. ${wNo(w)} ${e(w.title || "")}</span></button>`; };
   const note = (x, fresh) => { const c = COL[x.c] || COL.yellow, mine = x.id && MINE()[x.id];
-    return `<article class="gb-note${fresh ? " fresh" : ""}" style="--c:${c};--r:${tilt((x.id || x.t || "") + x.msg)}deg"><header><span class="gb-ava" aria-hidden="true">${face(x.s, "rgba(255,255,255,.7)")}</span><div><b>${e(x.name || "익명의 관람객")}</b><time>${e(when(x.t))}${x.e ? " · 고침" : ""}</time></div></header><p>${e(x.msg)}</p>${workChip(x)}${x.id ? `<div class="gb-mine${mine ? "" : " pw"}"><button type="button" data-edit="${e(x.id)}">고치기</button><button type="button" data-del="${e(x.id)}">지우기</button></div>` : ""}</article>`; };
+    return `<article class="gb-note${fresh ? " fresh" : ""}" style="--c:${c};--r:${tilt((x.id || x.t || "") + x.msg)}deg"><header><span class="gb-ava" aria-hidden="true">${face(x.s, "rgba(255,255,255,.7)")}</span><div><b>${e(x.name || "익명의 관람객")}</b><time>${e(when(x.t))}${x.e ? " · 고침" : ""}</time></div></header><p>${e(x.msg)}</p>${workChip(x)}${x.id ? `<div class="gb-mine${mine ? " my" : " pw"}"><button type="button" data-edit="${e(x.id)}">고치기</button><button type="button" data-del="${e(x.id)}">지우기</button></div>` : ""}</article>`; };
 
   /* ── 방문자 페이지 ── */
   const page = A("gb-page");
@@ -144,6 +144,12 @@ addEventListener("hashchange", () => {
       else { ta.value = ""; fav = ""; paintFav(); A("gb-count").textContent = "0 / 140"; }
     };
     A("gb-editx").addEventListener("click", () => { setEditing(null); msg.textContent = ""; });
+    /* 고치기 · 지우기는 쪽지에 마우스를 올리거나(모바일은 쪽지를 눌렀을 때) 나타난다 */
+    board.addEventListener("click", ev => {
+      if (ev.target.closest("button, a")) return;
+      const n = ev.target.closest(".gb-note"); if (!n || !n.querySelector(".gb-mine")) return;
+      const on = !n.classList.contains("open"); board.querySelectorAll(".gb-note.open").forEach(x => x.classList.remove("open")); n.classList.toggle("open", on);
+    });
     board.parentElement.addEventListener("click", async ev => {
       const wb = ev.target.closest("[data-work]"); if (wb) { const w = workOf(wb.dataset.work); if (w && typeof lb !== "undefined") lb.open(w, wb.querySelector("img") || wb); return; }
       const eb = ev.target.closest("[data-edit]"); if (eb) { const x = items.find(i => i.id === eb.dataset.edit); if (!x) return; const key = MINE()[x.id] || await askPw("글을 고치려면 남길 때 정한 비밀번호를 적어 주세요."); if (key) { x.key = key; setEditing(x); } return; }

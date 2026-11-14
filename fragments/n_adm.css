@@ -418,7 +418,7 @@ body.pk-open { overflow: hidden; }
 #lightbox { z-index: 130; }
 .gb-pwl input { max-width: 260px; }
 .gb-mine.pw { opacity: 0; transition: opacity .2s; } .gb-note:hover .gb-mine.pw, .gb-mine.pw:focus-within { opacity: 1; }
-@media (hover: none) { .gb-mine.pw { opacity: .7; } }
+
 .gb-pw { width: min(360px, 100%); background: #fff; border-radius: 18px; padding: 20px; display: grid; gap: 12px; box-shadow: 0 30px 80px rgba(0,0,0,.25); }
 .gb-pw p { margin: 0; font-size: 14px; line-height: 1.6; } .gb-pw input { font: inherit; font-size: 16px; padding: 10px 14px; border: 1px solid #d9d7df; border-radius: 12px; }
 .gb-pw div { display: flex; gap: 8px; justify-content: flex-end; } .gb-mini.strong2 { background: var(--ink); color: #fff; border-color: var(--ink); }
@@ -531,3 +531,10 @@ html, body { margin: 0; } /* 검은 첫 화면 · 흰 Works가 화면 끝까지 
 /* 모바일 아래 메뉴: 진행선 · 선택 표시 = 관람객 옷 색 */
 .dock-bar { background: var(--me, var(--cobalt)) !important; }
 .dock-nav button[aria-current="true"] { color: var(--me-ink, var(--cobalt)) !important; }
+
+/* 고치기 · 지우기: 올리거나 눌렀을 때만 */
+.gb-mine, .gb-mine.pw { position: absolute; top: 14px; right: 14px; margin: 0; opacity: 0; pointer-events: none; transition: opacity .2s; }
+@media (hover: hover) { .gb-note:hover .gb-mine { opacity: 1; pointer-events: auto; } }
+.gb-note.open .gb-mine, .gb-mine:focus-within { opacity: 1; pointer-events: auto; }
+@media (hover: none) { .gb-mine.pw { opacity: 0; } .gb-note.open .gb-mine { opacity: 1; } .gb-note:has(.gb-mine) { cursor: pointer; } }
+.gb-mine button { background: rgba(255,255,255,.9); }
