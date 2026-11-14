@@ -753,6 +753,15 @@ body.about .menu[hidden], body.contact .menu[hidden] { display: none !important;
 .inq-text { margin: 10px 0; white-space: pre-line; line-height: 1.7; font-size: 14.5px; }
 .inq-meta { margin: 0; display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; } .inq-meta a { color: var(--cobalt); }
 #inq-note[data-err="1"] { color: #c2414b; }
+
+.inq-files { display: grid; gap: 8px; font-size: 13px; color: var(--mute); } .inq-fl small { font-size: 12px; opacity: .8; }
+.inq-pick { justify-self: start; display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border: 1px dashed #b9b6c2; border-radius: 999px; color: var(--ink); cursor: pointer; font-size: 13.5px; background: #fff; }
+.inq-pick:hover { border-color: var(--ink); } .inq-pick:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+.inq-pick input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.inq-flist { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; } .inq-flist:empty { display: none; }
+.inq-flist li { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid #e5e3ea; border-radius: 10px; background: #fff; color: var(--ink); font-size: 13.5px; }
+.inq-flist li span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .inq-flist li em { font-style: normal; color: var(--mute); font-size: 12px; }
+.inq-flist button { border: 0; background: none; color: var(--mute); cursor: pointer; font-size: 18px; line-height: 1; padding: 0 2px; } .inq-flist button:hover { color: #c2414b; }
 </style>
 
 <a class="brand home-link" href="./" aria-label="gallery parranii 처음 화면으로 (새로고침)"><img class="b-ink" src="img/logo/parranii-logo.png" alt="" width="490" height="516"><img class="b-wh" src="img/logo/parranii-logo-white.png" alt="" width="490" height="516"></a>
@@ -803,9 +812,12 @@ body.about .menu[hidden], body.contact .menu[hidden] { display: none !important;
           <label>연락처<input name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="010-0000-0000"></label>
           <label class="wide">이메일<input name="email" type="email" autocomplete="email" placeholder="name@example.com"></label>
           <label class="wide">문의 내용<textarea name="msg" rows="6" required placeholder="관심 있는 작품, 전시, 구입 · 대여 문의 등을 자유롭게 적어 주세요."></textarea></label>
+          <div class="wide inq-files"><span class="inq-fl">첨부파일 <small>(사진 · PDF, 3개까지)</small></span>
+            <label class="inq-pick">파일 고르기<input id="inq-file" type="file" multiple accept="image/*,.pdf,.hwp,.hwpx,.doc,.docx"></label>
+            <ul id="inq-flist" class="inq-flist"></ul></div>
           <label class="inq-hp" aria-hidden="true">웹사이트<input name="website" tabindex="-1" autocomplete="off"></label>
         </div>
-        <p class="inq-note">답변 받으실 연락처나 이메일 중 하나는 꼭 적어 주세요. 적어 주신 정보는 문의 답변에만 쓰여요. 파일을 함께 보내시려면 <a href="https://forms.gle/stQhvizMiRZm5pDh8" target="_blank" rel="noopener">구글 폼에서 보내기</a>.</p>
+        <p class="inq-note">답변 받으실 연락처나 이메일 중 하나는 꼭 적어 주세요. 적어 주신 정보는 문의 답변에만 쓰여요.</p>
         <div class="inq-foot"><button class="inq-send" type="submit">보내기</button><span id="inq-msg" class="inq-msg" aria-live="polite"></span></div>
       </form>
       <div id="inq-done" class="inq-done" hidden><p>문의가 잘 전달됐어요. 확인하고 연락드릴게요.</p><button type="button" id="inq-again" class="inq-again">다른 문의 보내기</button></div>
@@ -2545,9 +2557,40 @@ if (sessionStorage.getItem("pr-scroll-top")) { try { sessionStorage.removeItem("
   const e = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
   /* ── 방문자: 문의 보내기 ── */
+  const SCRIPT = "https://script.google.com/macros/s/AKfycbwG3xdE-V2UO_5J6fPNooJOo-YbCld-IXHzX1Dnjuj3UMgCnt6Afsn0HSHz1TxioAdT/exec";
+  const MAXF = 3, MAXB = 10 * 1024 * 1024, MAXT = 15 * 1024 * 1024;
+  const kb = n => n < 1048576 ? Math.max(1, Math.round(n / 1024)) + "KB" : (n / 1048576).toFixed(1) + "MB";
+  /* 큰 사진은 긴 변 2400px · JPEG로 줄여서 보낸다 */
+  async function shrink(f) {
+    if (!/^image\/(jpeg|png|webp|heic|heif)$/i.test(f.type) || f.size < 1.5 * 1048576) return f;
+    try {
+      const bmp = await createImageBitmap(f), k = Math.min(1, 2400 / Math.max(bmp.width, bmp.height));
+      const c = document.createElement("canvas"); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+      const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(bmp, 0, 0, c.width, c.height);
+      const b = await new Promise(r => c.toBlob(r, "image/jpeg", .86));
+      return b && b.size < f.size ? new File([b], f.name.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" }) : f;
+    } catch { return f; }
+  }
+  const b64 = f => new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(",")[1] || ""); r.onerror = no; r.readAsDataURL(f); });
+
   const form = A("inq-form");
   if (form) {
     const msg = A("inq-msg"), btn = form.querySelector("button[type=submit]");
+    const pick = A("inq-file"), flist = A("inq-flist"); let files = [];
+    const bad = t => { msg.textContent = t; msg.dataset.err = "1"; };
+    const drawFiles = () => { flist.innerHTML = files.map((f, i) => `<li><span>${e(f.name)}</span><em>${kb(f.size)}</em><button type="button" data-i="${i}" aria-label="${e(f.name)} 빼기">×</button></li>`).join(""); };
+    pick?.addEventListener("change", async () => {
+      const add = [...pick.files]; pick.value = "";
+      for (const f0 of add) {
+        if (files.length >= MAXF) { bad(`파일은 ${MAXF}개까지 보낼 수 있어요.`); break; }
+        const f = await shrink(f0);
+        if (f.size > MAXB) { bad(`‘${f0.name}’은(는) 너무 커요. 10MB 이하로 보내 주세요.`); continue; }
+        if (files.reduce((a, x) => a + x.size, 0) + f.size > MAXT) { bad("파일을 모두 합쳐 15MB까지 보낼 수 있어요."); continue; }
+        files.push(f);
+      }
+      drawFiles();
+    });
+    flist?.addEventListener("click", ev => { const b = ev.target.closest("button[data-i]"); if (!b) return; files.splice(+b.dataset.i, 1); drawFiles(); });
     form.addEventListener("submit", async ev => {
       ev.preventDefault();
       const v = k => (form.elements[k]?.value || "").trim();
@@ -2556,11 +2599,16 @@ if (sessionStorage.getItem("pr-scroll-top")) { try { sessionStorage.removeItem("
       if (!v("phone") && !v("email")) { msg.textContent = "답변 받으실 연락처나 이메일 중 하나는 적어 주세요."; msg.dataset.err = "1"; return; }
       if (v("email") && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v("email"))) { msg.textContent = "이메일 주소를 다시 확인해 주세요."; msg.dataset.err = "1"; return; }
       const body = new URLSearchParams({ [F.name]: v("name"), [F.phone]: v("phone"), [F.email]: v("email"), [F.msg]: v("msg") });
-      btn.disabled = true; msg.dataset.err = ""; msg.textContent = "보내는 중…";
+      btn.disabled = true; msg.dataset.err = ""; msg.textContent = files.length ? "파일과 함께 보내는 중… 잠시만 기다려 주세요." : "보내는 중…";
       try {
-        await fetch(FORM + "/formResponse", { method: "POST", mode: "no-cors", body });
-        form.reset(); form.hidden = true; A("inq-done").hidden = false; msg.textContent = "";
+        if (files.length) {
+          const payload = { name: v("name"), phone: v("phone"), email: v("email"), msg: v("msg"), website: "",
+            files: await Promise.all(files.map(async f => ({ name: f.name, type: f.type || "application/octet-stream", data: await b64(f) }))) };
+          await fetch(SCRIPT, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
+        } else await fetch(FORM + "/formResponse", { method: "POST", mode: "no-cors", body });
+        form.reset(); files = []; drawFiles(); form.hidden = true; A("inq-done").hidden = false; msg.textContent = "";
       } catch {
+        if (files.length) { msg.textContent = "지금 이 화면에서는 파일을 보낼 수 없어요. parranii.com에서 다시 보내 주세요."; msg.dataset.err = "1"; btn.disabled = false; return; }
         /* 이 화면에서 바로 보낼 수 없을 때(claude.ai 미리보기 등): 내용이 채워진 구글 폼을 새 창으로 연다 */
         window.open(FORM + "/viewform?usp=pp_url&" + body.toString(), "_blank", "noopener");
         msg.textContent = "새 창에서 열린 문의서의 ‘제출’을 눌러 주세요."; msg.dataset.err = "";
@@ -2589,7 +2637,7 @@ if (sessionStorage.getItem("pr-scroll-top")) { try { sessionStorage.removeItem("
       list.innerHTML = rows.map((x, i) => { const [t, name, phone, email, msgv, file] = x; const isNew = i < total - seen;
         return `<article class="inq-item${isNew ? " new" : ""}"><header><b>${e(name || "(이름 없음)")}</b>${isNew ? `<span class="inq-new">새 문의</span>` : ""}<time>${e(t)}</time></header>
           <p class="inq-text">${e(msgv)}</p>
-          <p class="inq-meta">${phone ? `<a href="tel:${e(String(phone).replace(/[^\d+]/g, ""))}">${e(phone)}</a>` : ""}${email ? `<a href="mailto:${e(email)}">${e(email)}</a>` : ""}${file ? `<a href="${e(String(file).split(",")[0].trim())}" target="_blank" rel="noopener">첨부파일 보기</a>` : ""}</p></article>`; }).join("");
+          <p class="inq-meta">${phone ? `<a href="tel:${e(String(phone).replace(/[^\d+]/g, ""))}">${e(phone)}</a>` : ""}${email ? `<a href="mailto:${e(email)}">${e(email)}</a>` : ""}${String(file || "").split(",").map(u => u.trim()).filter(Boolean).map((u, k, all) => `<a href="${e(u)}" target="_blank" rel="noopener">첨부파일${all.length > 1 ? " " + (k + 1) : ""} 보기</a>`).join("")}</p></article>`; }).join("");
       localStorage.setItem(SEEN, String(total));
     } catch (err) {
       const c = err && err.code;
