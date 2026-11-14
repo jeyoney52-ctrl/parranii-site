@@ -492,3 +492,4 @@ body.pk-open { overflow: hidden; }
 .wk-bub:hover { filter: brightness(.97); }
 .wk-me .wk-bub { text-wrap: balance; }
 .wk-me .wk-bub { white-space: pre-line; max-width: 150px; }
+.wk-me .wk-bub.wide { max-width: 210px; text-wrap: wrap; }

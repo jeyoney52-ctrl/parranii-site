@@ -23,6 +23,7 @@
   /* 말 넣기: 이모티콘이 혼자 다음 줄로 떨어지지 않게 앞 낱말에 붙이고, 줄이 나뉘면 말풍선 폭을 글줄에 맞춰 좁힌다 */
   function setText(t) {
     bub.textContent = String(t).replace(/ (?=\p{Extended_Pictographic})/gu, "\u00a0");
+    bub.classList.toggle("wide", String(t).includes("\n"));
     bub.style.width = "";
     requestAnimationFrame(() => { const r = document.createRange(); r.selectNodeContents(bub); const rs = [...r.getClientRects()];
       if (rs.length > 1) { const w = Math.max(...rs.map(x => x.right)) - Math.min(...rs.map(x => x.left)); const cs = getComputedStyle(bub);
