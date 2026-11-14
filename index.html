@@ -755,8 +755,8 @@ body.about .menu[hidden], body.contact .menu[hidden] { display: none !important;
 #inq-note[data-err="1"] { color: #c2414b; }
 </style>
 
-<a class="brand" href="#top" aria-label="gallery parranii 처음으로"><img class="b-ink" src="img/logo/parranii-logo.png" alt="" width="490" height="516"><img class="b-wh" src="img/logo/parranii-logo-white.png" alt="" width="490" height="516"></a>
-<header class="top"><a href="#top" id="to-top-link">gallery parranii</a><nav aria-label="바로가기"><a href="#posters">works</a><a href="#room">exhibition</a><a href="#about">about</a><a href="#contact">contact</a><a id="admin-link" href="#admin" hidden>작품 관리</a></nav><button class="menu-btn" id="menu-btn" type="button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="menu"><i></i><i></i></button></header>
+<a class="brand home-link" href="./" aria-label="gallery parranii 처음 화면으로 (새로고침)"><img class="b-ink" src="img/logo/parranii-logo.png" alt="" width="490" height="516"><img class="b-wh" src="img/logo/parranii-logo-white.png" alt="" width="490" height="516"></a>
+<header class="top"><a href="./" id="to-top-link" class="home-link">gallery parranii</a><nav aria-label="바로가기"><a href="#posters">works</a><a href="#room">exhibition</a><a href="#about">about</a><a href="#contact">contact</a><a id="admin-link" href="#admin" hidden>작품 관리</a></nav><button class="menu-btn" id="menu-btn" type="button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="menu"><i></i><i></i></button></header>
 
 <!-- ───────── 첫 화면: 검은 화면에 줄로 걸린 전시 포스터 (스크롤하면 배경이 흰색으로) ───────── -->
 <div class="hero-wrap" id="hero-wrap">
@@ -2525,6 +2525,14 @@ function openPhotoEditor({ src, w, onSave, onReplace }) {
   addEventListener("hashchange", go); go();
 })();
 
+
+/* 로고 · gallery parranii: 주소의 #부분을 지우고 첫 화면부터 새로 불러온다 */
+document.querySelectorAll(".home-link").forEach(a => a.addEventListener("click", ev => {
+  if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button > 0) return; ev.preventDefault();
+  try { sessionStorage.setItem("pr-scroll-top", "1"); } catch {}
+  location.replace(location.origin + location.pathname);
+}));
+if (sessionStorage.getItem("pr-scroll-top")) { try { sessionStorage.removeItem("pr-scroll-top"); } catch {} if ("scrollRestoration" in history) history.scrollRestoration = "manual"; scrollTo(0, 0); }
 
 /* ───────── 문의하기 ─────────
    방문자: Contact 페이지 아래 칸에 쓰고 보내면 구글 폼으로 들어가고, 응답은 구글 시트(parranii 문의(응답))에 쌓인다.
