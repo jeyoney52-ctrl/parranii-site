@@ -2891,7 +2891,7 @@ const PrAva = (() => {
   const SKIN = ["#ffe3cc", "#f7cfa6", "#e0a97f", "#b47a55"];
   const CLO = ["#f27b7b", "#7fb8f0", "#7dd3a8", "#f6d365", "#b9a6f0", "#3d4a7a", "#ffffff", "#2f2b37"];
   const PARTS = {
-    hair: ["단발", "짧은 머리", "양갈래", "긴 머리", "뽀글 머리", "똥머리", "삐죽 머리", "가르마", "바가지 머리", "투블럭", "반삭", "올백", "꽁지머리", "짧은 곱슬"],
+    hair: ["단발", "짧은 머리", "양갈래", "긴 머리", "뽀글 머리", "똥머리", "삐죽 머리", "가르마", "바가지 머리", "투블럭", "반삭", "올백", "꽁지머리", "짧은 곱슬", "짧은 양갈래"],
     hairColor: ["까망", "갈색", "밤색", "금발", "분홍", "하늘", "보라", "하양"],
     skin: ["밝은 피부", "보통 피부", "구릿빛", "갈색 피부"],
     outfit: ["티셔츠", "줄무늬 티", "원피스", "멜빵바지", "후드티", "화가 앞치마", "세일러복", "니트"],
@@ -2900,13 +2900,15 @@ const PrAva = (() => {
     glasses: ["없음", "동그란 안경", "선글라스", "하트 안경"],
     item: ["없음", "붓", "팔레트", "꽃 한 송이", "하트 풍선", "그림 액자", "강아지"]
   };
+  /* 표정은 피부 칸에 함께 담는다(피부 + 4 × 표정) — 저장 형식(숫자 8개)을 바꾸지 않으려고 */
+  const FACE = ["기본", "방긋", "윙크", "하트 눈", "놀람", "메롱", "행복", "시무룩"];
   const KEYS = Object.keys(PARTS);
-  const parse = code => { const n = String(code || "").split(".").map(x => parseInt(x, 10)); return KEYS.map((k, i) => Number.isInteger(n[i]) && n[i] >= 0 && n[i] < PARTS[k].length ? n[i] : 0); };
+  const parse = code => { const n = String(code || "").split(".").map(x => parseInt(x, 10)); return KEYS.map((k, i) => Number.isInteger(n[i]) && n[i] >= 0 && n[i] < (k === "skin" ? PARTS.skin.length * FACE.length : PARTS[k].length) ? n[i] : 0); };
   const join = a => a.join(".");
   const valid = code => /^\d{1,2}(\.\d{1,2}){7}$/.test(String(code || ""));
   const rnd = n => Math.floor(Math.random() * n);
   function random() {
-    return join([rnd(PARTS.hair.length), Math.random() < .55 ? rnd(3) : rnd(HAIR.length), Math.random() < .7 ? rnd(2) : rnd(SKIN.length), rnd(PARTS.outfit.length), rnd(CLO.length),
+    return join([rnd(PARTS.hair.length), Math.random() < .55 ? rnd(3) : rnd(HAIR.length), (Math.random() < .7 ? rnd(2) : rnd(SKIN.length)) + 4 * (Math.random() < .35 ? 0 : rnd(FACE.length)), rnd(PARTS.outfit.length), rnd(CLO.length),
       Math.random() < .3 ? 0 : 1 + rnd(PARTS.hat.length - 1), Math.random() < .6 ? 0 : 1 + rnd(PARTS.glasses.length - 1), Math.random() < .3 ? 0 : 1 + rnd(PARTS.item.length - 1)]);
   }
   /* 색 밝기 조절 */
@@ -2914,7 +2916,7 @@ const PrAva = (() => {
     const f = v => Math.max(0, Math.min(255, Math.round(k < 0 ? v * (1 + k) : v + (255 - v) * k))); return "#" + [f(r), f(g), f(b)].map(v => v.toString(16).padStart(2, "0")).join(""); };
 
   function svg(code, bg, head) {
-    const [hs, hc, sk, o, ci, h, g, it] = parse(code);
+    const [hs, hc, skx, o, ci, h, g, it] = parse(code), sk = skx % 4, fx = Math.floor(skx / 4);
     const grid = Array.from({ length: N }, () => Array(N).fill(null));
     const set = (x, y, c) => { if (x >= 0 && y >= 0 && x < N && y < N) grid[y][x] = c; };
     /* 모양(점 묶음) 만들기 */
@@ -2975,7 +2977,7 @@ const PrAva = (() => {
     const noBang = hs === 7 || hs === 9 || hs === 10 || hs === 11;
     if (!noBang) { rect(front, 8, 9, 16, 1); pts(front, [[8, 10], [23, 10], [9, 10], [22, 10]]); }
     if (hs === 0) { rect(front, 7, 9, 3, 9); rect(front, 22, 9, 3, 9); }
-    if (hs === 1) { rect(front, 7, 9, 2, 3); rect(front, 23, 9, 2, 3); }
+    if (hs === 1 || hs === 14) { rect(front, 7, 9, 2, 3); rect(front, 23, 9, 2, 3); }
     if (hs === 2) { rect(front, 7, 9, 2, 6); rect(front, 23, 9, 2, 6); }
     if (hs === 3) { rect(front, 7, 9, 2, 13); rect(front, 23, 9, 2, 13); }
     if (hs === 4) { [[8, 6], [11, 4], [15, 3], [20, 4], [23, 6], [7, 10], [24, 10], [7, 14], [24, 14]].forEach(([x, y]) => ell(front, x, y, 2.2, 2.2)); }
@@ -2996,10 +2998,25 @@ const PrAva = (() => {
       if (hs === 7 && (x === 15 || x === 16) && y <= 8 && y >= 4) return hairD;
       return (y === 5 && x >= 12 && x <= 14) || (y === 6 && x === 11) ? tone(hair, .35) : (y >= 10 && (x <= 8 || x >= 23) ? hairD : hair); });
 
+    if (hs === 14) { layer(rect(S(), 5, 11, 2, 3), (x, y) => y === 13 ? hairD : hair); layer(rect(S(), 25, 11, 2, 3), (x, y) => y === 13 ? hairD : hair); set(7, 12, "#e85d75"); set(24, 12, "#e85d75"); }
     /* 7. 눈 · 볼 · 입 */
-    const ey = 13; set(12, ey, "#2b2430"); set(12, ey - 1, "#2b2430"); set(19, ey, "#2b2430"); set(19, ey - 1, "#2b2430");
-    set(10, 15, "#f6a5b5"); set(11, 15, "#f6a5b5"); set(20, 15, "#f6a5b5"); set(21, 15, "#f6a5b5");
-    set(15, 16, "#c85a6a"); set(16, 16, "#c85a6a");
+    const EK = "#2b2430", MO = "#c85a6a", PK = "#f6a5b5";
+    const dot = x => { set(x, 12, EK); set(x, 13, EK); };
+    const arc = x => { set(x - 1, 13, EK); set(x, 12, EK); set(x + 1, 13, EK); };        // ^ 웃는 눈
+    const cup = x => { set(x - 1, 12, EK); set(x, 13, EK); set(x + 1, 12, EK); };        // ‿ 감은 눈
+    const line = x => { set(x - 1, 13, EK); set(x, 13, EK); set(x + 1, 13, EK); };       // - 감은 눈
+    const heart = x => [[x - 1, 11], [x + 1, 11], [x - 1, 12], [x, 12], [x + 1, 12], [x, 13]].forEach(([a, b]) => set(a, b, "#e8457a"));
+    const smile = () => { set(14, 15, MO); set(15, 16, MO); set(16, 16, MO); set(17, 15, MO); };
+    if (fx === 0) { dot(12); dot(19); set(15, 16, MO); set(16, 16, MO); }
+    if (fx === 1) { arc(12); arc(19); smile(); set(15, 17, "#f07890"); set(16, 17, "#f07890"); }
+    if (fx === 2) { dot(12); line(19); smile(); }
+    if (fx === 3) { heart(12); heart(19); smile(); }
+    if (fx === 4) { dot(12); dot(19); set(11, 10, EK); set(20, 10, EK); [[15, 16], [16, 16], [15, 17], [16, 17]].forEach(([a, b]) => set(a, b, "#8a3040")); }
+    if (fx === 5) { line(12); dot(19); set(14, 16, MO); set(15, 16, MO); set(16, 16, MO); set(17, 16, MO); set(15, 17, "#f07890"); set(16, 17, "#f07890"); set(16, 18, "#f07890"); }
+    if (fx === 6) { cup(12); cup(19); smile(); }
+    if (fx === 7) { dot(12); dot(19); set(14, 17, MO); set(15, 16, MO); set(16, 16, MO); set(17, 17, MO); set(11, 11, EK); set(20, 11, EK); }
+    set(10, 15, PK); set(11, 15, PK); set(20, 15, PK); set(21, 15, PK);
+    if (fx === 3 || fx === 6) { set(9, 15, PK); set(22, 15, PK); }
 
     /* 8. 안경 */
     if (g === 1) { const ring = cx => { [[cx - 1, 10], [cx, 10], [cx + 1, 10], [cx - 1, 15], [cx, 15], [cx + 1, 15], [cx - 2, 11], [cx - 2, 12], [cx - 2, 13], [cx - 2, 14], [cx + 2, 11], [cx + 2, 12], [cx + 2, 13], [cx + 2, 14]].forEach(([x, y]) => set(x, y, OL)); set(cx + 1, 11, "#ffffff"); }; ring(12); ring(19); set(15, 12, OL); set(16, 12, OL); }
@@ -3032,7 +3049,7 @@ const PrAva = (() => {
     const back = bg ? `<rect x="-3" y="-2" width="38" height="38" fill="${bg}"/>` : "";
     return `<svg viewBox="${head ? "3 -1 26 26" : "-3 -2 38 38"}" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" aria-hidden="true" focusable="false">${back}${rects.join("")}</svg>`;
   }
-  return { svg, random, parse, join, valid, PARTS, KEYS, CLO, HAIR, SKIN };
+  return { svg, random, parse, join, valid, PARTS, KEYS, CLO, HAIR, SKIN, FACE };
 })();
 
 
@@ -3074,18 +3091,23 @@ addEventListener("hashchange", () => {
     const btn = form.querySelector("button[type=submit]"), ta = form.elements.msg;
     let me = { s: PrAva.random(), c: rnd(CK) }, items = null, shown = 24, loading = false, part = "hair", fav = "", editing = null;
     try { const sv = JSON.parse(localStorage.getItem("pr-gb-me") || "null"); if (sv && PrAva.valid(sv.s) && COL[sv.c]) me = sv; } catch {}
-    const TABS = [["hair", "머리"], ["hairColor", "머리색"], ["skin", "피부"], ["outfit", "옷"], ["color", "옷 색"], ["hat", "모자"], ["glasses", "안경"], ["item", "소품"], ["bg", "배경"]];
+    const TABS = [["hair", "머리"], ["hairColor", "머리색"], ["face", "표정"], ["skin", "피부"], ["outfit", "옷"], ["color", "옷 색"], ["hat", "모자"], ["glasses", "안경"], ["item", "소품"], ["bg", "배경"]];
     cols.innerHTML = TABS.map(([k, l]) => `<button type="button" role="tab" data-p="${k}">${l}</button>`).join("");
-    const setPart = (k, v) => { const a = PrAva.parse(me.s); a[PrAva.KEYS.indexOf(k)] = v; me.s = PrAva.join(a); };
+    const SKI = PrAva.KEYS.indexOf("skin");
+    const setPart = (k, v) => { const a = PrAva.parse(me.s);
+      if (k === "face") a[SKI] = a[SKI] % 4 + 4 * v; else if (k === "skin") a[SKI] = v + 4 * Math.floor(a[SKI] / 4); else a[PrAva.KEYS.indexOf(k)] = v;
+      me.s = PrAva.join(a); };
     const drawPick = () => {
       cols.querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", b.dataset.p === part));
       if (part === "bg") { pick.innerHTML = CK.map(k => `<button type="button" role="radio" class="sw" data-v="${k}" style="--c:${COL[k]}" aria-checked="${me.c === k}" aria-label="배경 ${k}"></button>`).join(""); return; }
-      const i = PrAva.KEYS.indexOf(part), cur = PrAva.parse(me.s)[i], names = PrAva.PARTS[part];
+      if (part === "face") { const cur = Math.floor(PrAva.parse(me.s)[SKI] / 4);
+        pick.innerHTML = PrAva.FACE.map((n, v) => { const a = PrAva.parse(me.s); a[SKI] = a[SKI] % 4 + 4 * v; return `<button type="button" role="radio" class="op" data-v="${v}" aria-checked="${v === cur}" title="${n}">${PrAva.svg(PrAva.join(a), COL[me.c], true)}<span>${n}</span></button>`; }).join(""); return; }
+      const i = PrAva.KEYS.indexOf(part), raw = PrAva.parse(me.s)[i], cur = part === "skin" ? raw % 4 : raw, names = PrAva.PARTS[part];
       if (part === "hairColor" || part === "skin" || part === "color") {
         pick.innerHTML = names.map((n, v) => `<button type="button" role="radio" class="sw" data-v="${v}" style="--c:${(part === "hairColor" ? PrAva.HAIR : part === "skin" ? PrAva.SKIN : PrAva.CLO)[v]}" aria-checked="${v === cur}" aria-label="${n}" title="${n}"></button>`).join(""); return; }
       const zoom = part === "hair" || part === "hat" || part === "glasses";
       const opt = v => { const a = PrAva.parse(me.s); a[i] = v; if (part === "hair") a[PrAva.KEYS.indexOf("hat")] = 0; return `<button type="button" role="radio" class="op" data-v="${v}" aria-checked="${v === cur}" title="${names[v]}">${PrAva.svg(PrAva.join(a), COL[me.c], zoom)}<span>${names[v]}</span></button>`; };
-      pick.innerHTML = part === "hair" ? [["짧은 머리", [1, 7, 8, 9, 10, 11, 13, 6]], ["긴 머리", [0, 3, 2, 5, 4, 12]]].map(([t, vs]) => `<p class="gb-grp">${t}</p>${vs.map(opt).join("")}`).join("") : names.map((n, v) => opt(v)).join("");
+      pick.innerHTML = part === "hair" ? [["짧은 머리", [1, 7, 8, 9, 10, 11, 13, 6, 14]], ["긴 머리", [0, 3, 2, 5, 4, 12]]].map(([t, vs]) => `<p class="gb-grp">${t}</p>${vs.map(opt).join("")}`).join("") : names.map((n, v) => opt(v)).join("");
     };
     const paintMe = pop => {
       ava.innerHTML = PrAva.svg(me.s, COL[me.c]); drawPick();
