@@ -1042,6 +1042,10 @@ html, body { margin: 0; } /* 검은 첫 화면 · 흰 Works가 화면 끝까지 
 .wkp-h .wkp-x { margin-left: 0; }
 .wkp-h .wkp-save { padding: 9px 22px; font-size: 14px; }
 @media (max-width: 720px) { .wkp-h { top: -16px; margin: -16px -14px 0; padding: 14px 14px 10px; } }
+
+/* 모바일 아래 메뉴: 진행선 · 선택 표시 = 관람객 옷 색 */
+.dock-bar { background: var(--me, var(--cobalt)) !important; }
+.dock-nav button[aria-current="true"] { color: var(--me-ink, var(--cobalt)) !important; }
 </style>
 
 <a class="brand home-link" href="./" aria-label="gallery parranii 처음 화면으로 (새로고침)"><img class="b-ink" src="img/logo/parranii-logo.png" alt="" width="490" height="516"><img class="b-wh" src="img/logo/parranii-logo-white.png" alt="" width="490" height="516"></a>
@@ -3769,6 +3773,15 @@ addEventListener("hashchange", () => {
       wasOn = on;
     }).observe(lbBox, { attributes: true, attributeFilter: ["class"] });
   }
+  /* 아래 메뉴의 진행선 · 선택된 메뉴 색 = 관람객 옷 색 (하양 옷이면 먹색, 연한 색 글자는 조금 진하게) */
+  const shade = (hex, k) => { const n = parseInt(hex.slice(1), 16), f = v => Math.round(v * (1 - k)); return `rgb(${f(n >> 16)}, ${f((n >> 8) & 255)}, ${f(n & 255)})`; };
+  painters.push(() => {
+    const c = PrAva.CLO[PrAva.parse(me.s)[PrAva.KEYS.indexOf("color")]] || "#1f1d2b", white = c.toLowerCase() === "#ffffff";
+    const n = parseInt(c.slice(1), 16), lum = (.299 * (n >> 16) + .587 * ((n >> 8) & 255) + .114 * (n & 255)) / 255;
+    const root = document.documentElement.style;
+    root.setProperty("--me", white ? "#1f1d2b" : c);
+    root.setProperty("--me-ink", white ? "#1f1d2b" : lum > .55 ? shade(c, .45) : c);
+  });
   /* ── 모바일: 아래 메뉴의 파란 진행선 위를 작은 관람객이 걷는다. 말풍선은 꼭 필요할 때만 잠깐 ── */
   const isM = () => matchMedia("(max-width: 720px)").matches;
   let mSay = null;
