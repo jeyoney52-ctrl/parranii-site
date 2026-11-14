@@ -174,6 +174,15 @@
       wasOn = on;
     }).observe(lbBox, { attributes: true, attributeFilter: ["class"] });
   }
+  /* 아래 메뉴의 진행선 · 선택된 메뉴 색 = 관람객 옷 색 (하양 옷이면 먹색, 연한 색 글자는 조금 진하게) */
+  const shade = (hex, k) => { const n = parseInt(hex.slice(1), 16), f = v => Math.round(v * (1 - k)); return `rgb(${f(n >> 16)}, ${f((n >> 8) & 255)}, ${f(n & 255)})`; };
+  painters.push(() => {
+    const c = PrAva.CLO[PrAva.parse(me.s)[PrAva.KEYS.indexOf("color")]] || "#1f1d2b", white = c.toLowerCase() === "#ffffff";
+    const n = parseInt(c.slice(1), 16), lum = (.299 * (n >> 16) + .587 * ((n >> 8) & 255) + .114 * (n & 255)) / 255;
+    const root = document.documentElement.style;
+    root.setProperty("--me", white ? "#1f1d2b" : c);
+    root.setProperty("--me-ink", white ? "#1f1d2b" : lum > .55 ? shade(c, .45) : c);
+  });
   /* ── 모바일: 아래 메뉴의 파란 진행선 위를 작은 관람객이 걷는다. 말풍선은 꼭 필요할 때만 잠깐 ── */
   const isM = () => matchMedia("(max-width: 720px)").matches;
   let mSay = null;
