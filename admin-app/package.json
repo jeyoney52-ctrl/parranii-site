@@ -1,0 +1,6 @@
+{
+  "name": "parranii-admin",
+  "private": true,
+  "type": "module",
+  "devDependencies": { "wrangler": "^4" }
+}

@@ -1,0 +1,15 @@
+name = "parranii-admin"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+workers_dev = true
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[triggers]
+crons = ["* * * * *"]
+
+[vars]
+SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwG3xdE-V2UO_5J6fPNooJOo-YbCld-IXHzX1Dnjuj3UMgCnt6Afsn0HSHz1TxioAdT/exec"
+VAPID_PUBLIC = "BBuT1_nxA5yi-1pB1uwxh-0TxQB_FtYibtr4qh__XxXEhdtvuQdLQZNGAXeDTh1KvLNfRrDy_2FL-Fh6d3aj5JQ"
