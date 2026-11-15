@@ -5,13 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f8f6f1">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="파르라니 관리">
+<meta name="format-detection" content="telephone=no">
 <meta name="robots" content="noindex">
 <title>파르라니 관리</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Gowun+Dodum&family=Jost:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Gowun+Dodum&display=swap">
 <link rel="stylesheet" href="app.css">
 </head>
 <body>
@@ -25,26 +28,41 @@
   </form>
 </main>
 
-<div id="app" hidden>
-  <header class="top">
-    <div class="ttl"><img src="icon-192.png" alt=""><b>파르라니 관리</b></div>
-    <button type="button" id="refresh" class="icon" aria-label="새로고침">↻</button>
+<div id="app" class="app" hidden>
+  <header class="bar">
+    <h1 id="title">문의</h1>
+    <button type="button" id="refresh" class="icon" aria-label="새로고침"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   </header>
 
-  <section class="quick">
-    <a class="q" href="https://claude.ai/artifact/2LBF5iCfRSWjPWF6aK1n4E#admin" target="_blank" rel="noopener"><span>✏️</span>작품 · 소식 고치기</a>
-    <a class="q" href="https://parranii.com" target="_blank" rel="noopener"><span>🖼</span>parranii.com 보기</a>
-    <button type="button" class="q" id="bell"><span>🔔</span><em id="bell-t">알림 켜기</em></button>
-  </section>
-  <p class="hint" id="bell-hint" hidden></p>
+  <div class="ptr" id="ptr" aria-hidden="true"><span>↓</span></div>
 
-  <nav class="tabs" role="tablist">
-    <button type="button" role="tab" data-tab="inq" aria-selected="true">문의 <i id="n-inq" hidden></i></button>
-    <button type="button" role="tab" data-tab="gb" aria-selected="false">방명록 <i id="n-gb" hidden></i></button>
+  <main class="view" id="view">
+    <div class="banner" id="banner" hidden><span>🔔 알림을 켜면 새 글이 오자마자 알려 드려요</span><button type="button" id="banner-on">켜기</button></div>
+    <p class="note" id="note" aria-live="polite"></p>
+    <section id="list" class="list"></section>
+
+    <section id="settings" class="settings" hidden>
+      <div class="group">
+        <button type="button" class="row" id="bell"><span class="ic">🔔</span><span class="lb">알림<small id="bell-sub">새 문의 · 방명록이 오면 알려 줘요</small></span><span class="sw" id="bell-sw" aria-hidden="true"><i></i></span></button>
+        <p class="hint" id="bell-hint" hidden></p>
+        <button type="button" class="row" id="test"><span class="ic">📳</span><span class="lb">알림 테스트<small>이 핸드폰으로 테스트 알림 보내기</small></span><span class="go">›</span></button>
+      </div>
+      <div class="group">
+        <a class="row" href="https://claude.ai/artifact/2LBF5iCfRSWjPWF6aK1n4E#admin" target="_blank" rel="noopener"><span class="ic">✏️</span><span class="lb">작품 · 소식 고치기<small>관리 화면(claude.ai)이 열려요</small></span><span class="go">↗</span></a>
+        <a class="row" href="https://parranii.com" target="_blank" rel="noopener"><span class="ic">🖼</span><span class="lb">parranii.com 보기</span><span class="go">↗</span></a>
+        <a class="row" href="https://docs.google.com/spreadsheets/d/18LiQBcW7E1A_0lXvUlk_LBEVeyG4XnxqHsTI9h085lI/edit" target="_blank" rel="noopener"><span class="ic">📊</span><span class="lb">구글 시트 열기</span><span class="go">↗</span></a>
+      </div>
+      <div class="group"><button type="button" class="row danger" id="logout"><span class="ic">🚪</span><span class="lb">로그아웃</span></button></div>
+    </section>
+  </main>
+
+  <nav class="tabbar" role="tablist">
+    <button type="button" role="tab" data-tab="inq" aria-selected="true"><span class="ti"><b>📮</b><i id="n-inq" hidden></i></span>문의</button>
+    <button type="button" role="tab" data-tab="gb" aria-selected="false"><span class="ti"><b>💌</b><i id="n-gb" hidden></i></span>방명록</button>
+    <a class="tab-link" href="https://claude.ai/artifact/2LBF5iCfRSWjPWF6aK1n4E#admin" target="_blank" rel="noopener"><span class="ti"><b>✏️</b></span>고치기</a>
+    <button type="button" role="tab" data-tab="set" aria-selected="false"><span class="ti"><b>⚙️</b></span>설정</button>
   </nav>
-  <p class="note" id="note" aria-live="polite"></p>
-  <section id="list" class="list"></section>
-  <footer class="foot"><button type="button" id="logout" class="link">로그아웃</button> · <button type="button" id="test" class="link">알림 테스트</button></footer>
+  <div class="toast" id="toast" role="status" hidden></div>
 </div>
 
 <script src="ava.js"></script>
